@@ -12,7 +12,6 @@ import java.lang.reflect.Method;
 import java.util.*;
 
 public class SpringApiAnalyzer {
-
     private String packagePath;
 
     List<Class> ignoreAnnotations;
