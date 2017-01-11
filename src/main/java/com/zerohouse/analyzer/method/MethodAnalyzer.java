@@ -1,4 +1,4 @@
-package com.zerohouse;
+package com.zerohouse.analyzer.method;
 
 import java.lang.reflect.Method;
 import java.util.Map;

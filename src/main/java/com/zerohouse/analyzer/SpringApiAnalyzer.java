@@ -1,5 +1,6 @@
-package com.zerohouse;
+package com.zerohouse.analyzer;
 
+import com.zerohouse.analyzer.method.*;
 import org.reflections.Reflections;
 import org.reflections.scanners.MethodAnnotationsScanner;
 import org.reflections.scanners.SubTypesScanner;
