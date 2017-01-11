@@ -1,4 +1,4 @@
-package com.zerohouse.annotation;
+package com.zerohouse.analyzer.annotation;
 
 
 import java.lang.annotation.*;

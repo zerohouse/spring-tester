@@ -1,7 +1,7 @@
 package com.zerohouse.analyzer.method;
 
 
-import com.zerohouse.annotation.ApiDescription;
+import com.zerohouse.analyzer.annotation.ApiDescription;
 
 import java.lang.reflect.Method;
 import java.util.Map;
