@@ -21,7 +21,7 @@ public class SampleParameterGenerator implements MethodAnalyzer {
     @Override
     public void analyze(Method method, Map apiAnalysis) {
         if (!Arrays.stream(method.getParameters()).anyMatch(parameter -> parameter.isAnnotationPresent(RequestBody.class))) {
-            HashMap<String, String> parameterSample = new HashMap<>();
+            HashMap<String, String> params = new HashMap<>();
             ParameterNameDiscoverer parameterNameDiscoverer = new DefaultParameterNameDiscoverer();
             for (int i = 0; i < method.getParameters().length; i++) {
                 Parameter parameter = method.getParameters()[i];
@@ -29,20 +29,20 @@ public class SampleParameterGenerator implements MethodAnalyzer {
                     return;
                 if (ignoreClasses.stream().anyMatch(aClass -> aClass.equals(parameter.getType())))
                     return;
-                parameterSample.put(parameterNameDiscoverer.getParameterNames(method)[i], "");
+                params.put(parameterNameDiscoverer.getParameterNames(method)[i], "");
             }
-            apiAnalysis.put("parameterSample", parameterSample);
+            apiAnalysis.put("params", params);
             return;
         }
         Parameter find = Arrays.stream(method.getParameters()).filter(parameter -> parameter.isAnnotationPresent(RequestBody.class)).findAny().get();
         try {
             apiAnalysis.put("json", true);
             if (find.getType() == List.class)
-                apiAnalysis.put("parameterSample", new ArrayList<>());
+                apiAnalysis.put("params", new ArrayList<>());
             else if (find.getType() == Map.class)
-                apiAnalysis.put("parameterSample", new HashMap<>());
+                apiAnalysis.put("params", new HashMap<>());
             else
-                apiAnalysis.put("parameterSample", find.getType().newInstance());
+                apiAnalysis.put("params", find.getType().newInstance());
         } catch (InstantiationException | IllegalAccessException e) {
             e.printStackTrace();
         }
