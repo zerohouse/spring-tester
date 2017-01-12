@@ -48,7 +48,7 @@ public class SpringApiAnalyzer {
         return apiAnalysisList;
     }
 
-    public String generateTestPageString() throws IOException {
+    public String getTestPageHtml() throws IOException {
         String html = getStringFromFile("analyzer.html");
         String vendor = getStringFromFile("analyzer.vendor.js");
         String js = getStringFromFile("analyzer.js");
@@ -56,6 +56,10 @@ public class SpringApiAnalyzer {
         html = html.replace("<script src=\"analyzer.vendor.js\" type=\"text/javascript\"></script>", "<script>" + vendor + "</script>");
         html = html.replace("<script src=\"analyzer.js\" type=\"text/javascript\"></script>", "<script>" + apis + js + "</script>");
         return html;
+    }
+
+    public void generateTestPageHtml(String path) throws IOException {
+        FileUtils.writeStringToFile(new File(path), getTestPageHtml(), "utf8");
     }
 
     private String getStringFromFile(String path) throws IOException {
