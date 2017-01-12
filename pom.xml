@@ -4,8 +4,7 @@
     <modelVersion>4.0.0</modelVersion>
     <groupId>com.zerohouse</groupId>
     <artifactId>SpringAnalyzer</artifactId>
-    <version>0.0.4
-    </version>
+    <version>0.0.6</version>
     <packaging>jar</packaging>
     <parent>
         <groupId>org.springframework.boot</groupId>
@@ -48,6 +47,11 @@
         <resources>
             <resource>
                 <directory>src/main/resources</directory>
+                <includes>
+                    <include>analyzer.html</include>
+                    <include>analyzer.js</include>
+                    <include>analyzer.vendor.js</include>
+                </includes>
             </resource>
         </resources>
         <plugins>

@@ -3,6 +3,7 @@ package com.zerohouse.analyzer;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.zerohouse.analyzer.method.*;
 import org.apache.commons.io.FileUtils;
+import org.apache.commons.io.IOUtils;
 import org.reflections.Reflections;
 import org.reflections.scanners.MethodAnnotationsScanner;
 import org.reflections.scanners.SubTypesScanner;
@@ -10,8 +11,10 @@ import org.reflections.scanners.TypeAnnotationsScanner;
 import org.reflections.util.ClasspathHelper;
 import org.springframework.web.bind.annotation.RequestMapping;
 
+import java.io.BufferedReader;
 import java.io.File;
 import java.io.IOException;
+import java.io.InputStreamReader;
 import java.lang.reflect.Method;
 import java.util.*;
 
@@ -49,9 +52,9 @@ public class SpringApiAnalyzer {
     }
 
     public String getTestPageHtml() throws IOException {
-        String html = getStringFromFile("analyzer.html");
-        String vendor = getStringFromFile("analyzer.vendor.js");
-        String js = getStringFromFile("analyzer.js");
+        String html = getStringFromFile("/analyzer.html");
+        String vendor = getStringFromFile("/analyzer.vendor.js");
+        String js = getStringFromFile("/analyzer.js");
         String apis = "var apis =" + new ObjectMapper().writeValueAsString(getApiList()) + ";";
         html = html.replace("<script src=\"analyzer.vendor.js\" type=\"text/javascript\"></script>", "<script>" + vendor + "</script>");
         html = html.replace("<script src=\"analyzer.js\" type=\"text/javascript\"></script>", "<script>" + apis + js + "</script>");
@@ -63,9 +66,8 @@ public class SpringApiAnalyzer {
     }
 
     private String getStringFromFile(String path) throws IOException {
-        ClassLoader classLoader = getClass().getClassLoader();
-        File file = new File(classLoader.getResource(path).getFile());
-        return FileUtils.readFileToString(file, "utf8");
+        BufferedReader txtReader = new BufferedReader(new InputStreamReader(getClass().getResourceAsStream(path)));
+        return IOUtils.toString(txtReader);
     }
 
     public void addIgnoreAnnotation(Class aClass) {
