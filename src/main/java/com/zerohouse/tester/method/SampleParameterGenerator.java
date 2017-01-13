@@ -26,9 +26,9 @@ public class SampleParameterGenerator implements MethodAnalyzer {
             for (int i = 0; i < method.getParameters().length; i++) {
                 Parameter parameter = method.getParameters()[i];
                 if (ignoreAnnotations.stream().anyMatch(parameter::isAnnotationPresent))
-                    return;
+                    continue;
                 if (ignoreClasses.stream().anyMatch(aClass -> aClass.equals(parameter.getType())))
-                    return;
+                    continue;
                 params.put(parameterNameDiscoverer.getParameterNames(method)[i], "");
             }
             apiAnalysis.put("parameter", params);
