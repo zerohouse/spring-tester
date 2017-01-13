@@ -37,7 +37,7 @@ public class SampleParameterGenerator implements MethodAnalyzer {
         Parameter find = Arrays.stream(method.getParameters()).filter(parameter -> parameter.isAnnotationPresent(RequestBody.class)).findAny().get();
         try {
             apiAnalysis.put("json", true);
-            if (find.getType() == List.class)
+            if (find.getType() == List.class || find.getType().isArray())
                 apiAnalysis.put("parameter", new ArrayList<>());
             else if (find.getType() == Map.class)
                 apiAnalysis.put("parameter", new HashMap<>());
