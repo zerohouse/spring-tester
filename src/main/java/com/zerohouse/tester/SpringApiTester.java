@@ -64,11 +64,12 @@ public class SpringApiTester {
         String html = getStringFromFile("/tester.html");
         String vendor = getStringFromFile("/vendor.js");
         String js = getStringFromFile("/tester.js");
-        String apis = "var apis =" + objectMapper.writeValueAsString(getApiList()) + ";";
-        String title = "var title = '" + this.title + "';";
-        String headers = "var headers =" + objectMapper.writeValueAsString(defaultHeaders) + ";";
+        String injects = "var apis =" + objectMapper.writeValueAsString(getApiList()) + ";";
+        injects+= "var headers =" + objectMapper.writeValueAsString(defaultHeaders) + ";";
+        if (this.title != null)
+            injects += "var title = '" + this.title + "';";
         html = html.replace("<script src=\"vendor.js\" type=\"text/javascript\"></script>", "<script>" + vendor + "</script>");
-        html = html.replace("<script src=\"tester.js\" type=\"text/javascript\"></script>", "<script>" + title + headers + apis + js + "</script>");
+        html = html.replace("<script src=\"tester.js\" type=\"text/javascript\"></script>", "<script>" + injects + js + "</script>");
         return html;
     }
 
