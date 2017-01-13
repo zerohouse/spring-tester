@@ -26,8 +26,17 @@ public class SpringApiTester {
     List<Class> ignoreAnnotations;
     List<Class> ignoreClasses;
     List<MethodAnalyzer> methodAnalyzers;
-    Map<String, String> defaultHttpHeaders;
-    Map<String, String> defaultTableHeaders;
+    Map<String, String> httpHeaders;
+
+    public Map<String, String> getTableHeaders() {
+        return tableHeaders;
+    }
+
+    public void setTableHeaders(Map<String, String> tableHeaders) {
+        this.tableHeaders = tableHeaders;
+    }
+
+    Map<String, String> tableHeaders;
 
 
     public SpringApiTester() {
@@ -35,12 +44,12 @@ public class SpringApiTester {
 
     public SpringApiTester(String packagePath) {
         objectMapper = new ObjectMapper();
-        defaultHttpHeaders = new HashMap<>();
-        defaultTableHeaders = new HashMap<>();
-        defaultHttpHeaders.put("name", "이름");
-        defaultHttpHeaders.put("url", "Url");
-        defaultHttpHeaders.put("method", "Method");
-        defaultHttpHeaders.put("paramNames", "Parameters");
+        httpHeaders = new HashMap<>();
+        tableHeaders = new HashMap<>();
+        httpHeaders.put("name", "이름");
+        httpHeaders.put("url", "Url");
+        httpHeaders.put("method", "Method");
+        httpHeaders.put("paramNames", "Parameters");
 
         this.packagePath = packagePath;
         ignoreAnnotations = new ArrayList<>();
@@ -73,8 +82,8 @@ public class SpringApiTester {
         String vendor = getStringFromFile("/vendor.js");
         String js = getStringFromFile("/tester.js");
         String injects = "var apis =" + objectMapper.writeValueAsString(getApiList()) + ";";
-        injects += "var headers =" + objectMapper.writeValueAsString(defaultHttpHeaders) + ";";
-        injects += "var defaultHeaders =" + objectMapper.writeValueAsString(defaultTableHeaders) + ";";
+        injects += "var headers =" + objectMapper.writeValueAsString(httpHeaders) + ";";
+        injects += "var tableHeaders =" + objectMapper.writeValueAsString(tableHeaders) + ";";
         if (this.title != null)
             injects += "var title = '" + this.title + "';";
         html = html.replace("<script src=\"vendor.js\" type=\"text/javascript\"></script>", "<script>" + vendor + "</script>");
@@ -111,7 +120,7 @@ public class SpringApiTester {
         this.title = title;
     }
 
-    public void putDefaultHttpHeader(String key, String value) {
-        defaultHttpHeaders.put(key, value);
+    public void putHttpHeader(String key, String value) {
+        httpHeaders.put(key, value);
     }
 }
