@@ -39,6 +39,6 @@ public class ParameterNamesGenerator implements MethodAnalyzer {
             return;
         }
         Parameter find = Arrays.stream(method.getParameters()).filter(parameter -> parameter.isAnnotationPresent(RequestBody.class)).findAny().get();
-        apiAnalysis.put("paramNames", find.getType().getSimpleName());
+        apiAnalysis.put("paramNames", find.getType().getSimpleName() + " (JSON BODY)");
     }
 }
