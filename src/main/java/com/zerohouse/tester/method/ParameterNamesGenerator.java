@@ -30,9 +30,9 @@ public class ParameterNamesGenerator implements MethodAnalyzer {
             for (int i = 0; i < method.getParameters().length; i++) {
                 Parameter parameter = method.getParameters()[i];
                 if (ignoreAnnotations.stream().anyMatch(parameter::isAnnotationPresent))
-                    return;
+                    continue;
                 if (ignoreClasses.stream().anyMatch(aClass -> aClass.equals(parameter.getType())))
-                    return;
+                    continue;
                 paramNames.add(parameterNameDiscoverer.getParameterNames(method)[i]);
             }
             apiAnalysis.put("paramNames", paramNames.stream().collect(Collectors.joining(", ")));
