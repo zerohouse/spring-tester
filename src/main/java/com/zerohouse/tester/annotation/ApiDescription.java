@@ -12,9 +12,6 @@ public @interface ApiDescription {
 
     String name() default "";
 
-    String apiFor() default "";
-
     String description() default "";
 
-    String parameterDescription() default "";
 }

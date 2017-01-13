@@ -2,6 +2,11 @@ var app = angular.module('app', ["ngPrettyJson", 'ngFileUpload']);
 app.controller('apiCtrl', function ($scope, $http) {
 
     $scope.headers = typeof headers === "undefined" ? {} : headers;
+    $scope.tableHeaders = typeof tableHeaders === "undefined" ? {
+            name: "이름",
+            url: "URL",
+            method: "Method"
+        } : tableHeaders;
     $scope.apis = typeof apis === "undefined" ? [] : apis;
     $scope.title = typeof title === "undefined" ? "" : title;
 
@@ -50,13 +55,13 @@ app.controller('apiCtrl', function ($scope, $http) {
         options.headers = $scope.headers;
         if (method === "GET" || method === "DELETE") {
             options.url += "?dc=" + new Date().getTime().toString();
-            options.params = api.params;
+            options.parameter = api.parameter;
         } else if ($scope.type === "json")
-            options.data = api.params;
+            options.data = api.parameter;
         else if ($scope.type === "form") {
             var fd = new FormData();
-            for (var key in api.params) {
-                fd.append(key, api.params[key]);
+            for (var key in api.parameter) {
+                fd.append(key, api.parameter[key]);
             }
             options.data = fd;
             options.transformRequest = angular.identity;
@@ -71,7 +76,7 @@ app.controller('apiCtrl', function ($scope, $http) {
                 }
                 return str.join("&");
             };
-            options.data = api.params;
+            options.data = api.parameter;
         }
 
         $http(options).then(function onSuccess(res) {

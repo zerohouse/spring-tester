@@ -26,14 +26,21 @@ public class SpringApiTester {
     List<Class> ignoreAnnotations;
     List<Class> ignoreClasses;
     List<MethodAnalyzer> methodAnalyzers;
+    Map<String, String> defaultHttpHeaders;
+    Map<String, String> defaultTableHeaders;
 
 
-    Map<String, String> defaultHeaders;
-
+    public SpringApiTester() {
+    }
 
     public SpringApiTester(String packagePath) {
         objectMapper = new ObjectMapper();
-        defaultHeaders = new HashMap<>();
+        defaultHttpHeaders = new HashMap<>();
+        defaultTableHeaders = new HashMap<>();
+        defaultHttpHeaders.put("name", "이름");
+        defaultHttpHeaders.put("url", "Url");
+        defaultHttpHeaders.put("method", "Method");
+        defaultHttpHeaders.put("paramNames", "Parameters");
 
         this.packagePath = packagePath;
         ignoreAnnotations = new ArrayList<>();
@@ -43,6 +50,7 @@ public class SpringApiTester {
         methodAnalyzers.add(new HttpMethodAnalyzer());
         methodAnalyzers.add(new ApiDescriptionAnalyzer());
         methodAnalyzers.add(new SampleParameterGenerator(ignoreAnnotations, ignoreClasses));
+        methodAnalyzers.add(new ParameterNamesGenerator(ignoreAnnotations, ignoreClasses));
     }
 
     public List<Map> getApiList() {
@@ -65,7 +73,8 @@ public class SpringApiTester {
         String vendor = getStringFromFile("/vendor.js");
         String js = getStringFromFile("/tester.js");
         String injects = "var apis =" + objectMapper.writeValueAsString(getApiList()) + ";";
-        injects+= "var headers =" + objectMapper.writeValueAsString(defaultHeaders) + ";";
+        injects += "var headers =" + objectMapper.writeValueAsString(defaultHttpHeaders) + ";";
+        injects += "var defaultHeaders =" + objectMapper.writeValueAsString(defaultTableHeaders) + ";";
         if (this.title != null)
             injects += "var title = '" + this.title + "';";
         html = html.replace("<script src=\"vendor.js\" type=\"text/javascript\"></script>", "<script>" + vendor + "</script>");
@@ -102,7 +111,7 @@ public class SpringApiTester {
         this.title = title;
     }
 
-    public Map<String, String> getDefaultHeaders() {
-        return defaultHeaders;
+    public void putDefaultHttpHeader(String key, String value) {
+        defaultHttpHeaders.put(key, value);
     }
 }

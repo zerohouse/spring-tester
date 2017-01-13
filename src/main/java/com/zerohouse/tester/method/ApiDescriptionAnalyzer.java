@@ -13,8 +13,6 @@ public class ApiDescriptionAnalyzer implements MethodAnalyzer {
             return;
         ApiDescription apiDescription = method.getAnnotation(ApiDescription.class);
         apiAnalysis.put("name", apiDescription.name());
-        apiAnalysis.put("apiFor", apiDescription.apiFor());
         apiAnalysis.put("description", apiDescription.description());
-        apiAnalysis.put("parameterDescription", apiDescription.parameterDescription());
     }
 }
