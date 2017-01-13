@@ -18,6 +18,13 @@
     
     
 ### pom.xml
+#### repository
+    <repository>
+        <id>jitpack.io</id>
+        <url>https://jitpack.io</url>
+    </repository>
+    
+#### dependency    
      <dependency>
          <groupId>com.github.zerohouse</groupId>
          <artifactId>spring-tester</artifactId>
