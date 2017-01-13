@@ -1,4 +1,4 @@
-package com.zerohouse.analyzer.annotation;
+package com.zerohouse.tester.annotation;
 
 
 import java.lang.annotation.ElementType;

@@ -3,8 +3,8 @@
          xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/xsd/maven-4.0.0.xsd">
     <modelVersion>4.0.0</modelVersion>
     <groupId>com.zerohouse</groupId>
-    <artifactId>SpringAnalyzer</artifactId>
-    <version>0.0.6</version>
+    <artifactId>SpringApiTester</artifactId>
+    <version>0.0.7</version>
     <packaging>jar</packaging>
     <parent>
         <groupId>org.springframework.boot</groupId>
@@ -25,12 +25,6 @@
             <scope>test</scope>
         </dependency>
         <dependency>
-            <groupId>org.projectlombok</groupId>
-            <artifactId>lombok</artifactId>
-            <version>1.16.8</version>
-            <scope>provided</scope>
-        </dependency>
-        <dependency>
             <groupId>org.reflections</groupId>
             <artifactId>reflections</artifactId>
             <version>RELEASE</version>
@@ -48,9 +42,9 @@
             <resource>
                 <directory>src/main/resources</directory>
                 <includes>
-                    <include>analyzer.html</include>
-                    <include>analyzer.js</include>
-                    <include>analyzer.vendor.js</include>
+                    <include>tester.html</include>
+                    <include>tester.js</include>
+                    <include>vendor.js</include>
                 </includes>
             </resource>
         </resources>

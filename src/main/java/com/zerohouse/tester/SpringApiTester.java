@@ -1,7 +1,7 @@
-package com.zerohouse.analyzer;
+package com.zerohouse.tester;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
-import com.zerohouse.analyzer.method.*;
+import com.zerohouse.tester.method.*;
 import org.apache.commons.io.FileUtils;
 import org.apache.commons.io.IOUtils;
 import org.reflections.Reflections;
@@ -18,14 +18,23 @@ import java.io.InputStreamReader;
 import java.lang.reflect.Method;
 import java.util.*;
 
-public class SpringApiAnalyzer {
+public class SpringApiTester {
+    private ObjectMapper objectMapper;
     private String packagePath;
+    private String title;
 
     List<Class> ignoreAnnotations;
     List<Class> ignoreClasses;
     List<MethodAnalyzer> methodAnalyzers;
 
-    public SpringApiAnalyzer(String packagePath) {
+
+    Map<String, String> defaultHeaders;
+
+
+    public SpringApiTester(String packagePath) {
+        objectMapper = new ObjectMapper();
+        defaultHeaders = new HashMap<>();
+
         this.packagePath = packagePath;
         ignoreAnnotations = new ArrayList<>();
         ignoreClasses = new ArrayList<>();
@@ -52,12 +61,14 @@ public class SpringApiAnalyzer {
     }
 
     public String getTestPageHtml() throws IOException {
-        String html = getStringFromFile("/analyzer.html");
-        String vendor = getStringFromFile("/analyzer.vendor.js");
-        String js = getStringFromFile("/analyzer.js");
-        String apis = "var apis =" + new ObjectMapper().writeValueAsString(getApiList()) + ";";
-        html = html.replace("<script src=\"analyzer.vendor.js\" type=\"text/javascript\"></script>", "<script>" + vendor + "</script>");
-        html = html.replace("<script src=\"analyzer.js\" type=\"text/javascript\"></script>", "<script>" + apis + js + "</script>");
+        String html = getStringFromFile("/tester.html");
+        String vendor = getStringFromFile("/vendor.js");
+        String js = getStringFromFile("/tester.js");
+        String apis = "var apis =" + objectMapper.writeValueAsString(getApiList()) + ";";
+        String title = "var title = '" + this.title + "';";
+        String headers = "var headers =" + objectMapper.writeValueAsString(defaultHeaders) + ";";
+        html = html.replace("<script src=\"vendor.js\" type=\"text/javascript\"></script>", "<script>" + vendor + "</script>");
+        html = html.replace("<script src=\"tester.js\" type=\"text/javascript\"></script>", "<script>" + title + headers + apis + js + "</script>");
         return html;
     }
 
@@ -70,15 +81,23 @@ public class SpringApiAnalyzer {
         return IOUtils.toString(txtReader);
     }
 
-    public void addIgnoreAnnotation(Class aClass) {
+    public void addParameterIgnoreAnnotation(Class aClass) {
         ignoreAnnotations.add(aClass);
     }
 
-    public void addIgnoreClass(Class aClass) {
+    public void addParameterIgnoreClass(Class aClass) {
         ignoreClasses.add(aClass);
     }
 
     public void addMethodAnalyzer(MethodAnalyzer methodAnalyzer) {
         methodAnalyzers.add(methodAnalyzer);
+    }
+
+    public void setTitle(String title) {
+        this.title = title;
+    }
+
+    public Map<String, String> getDefaultHeaders() {
+        return defaultHeaders;
     }
 }

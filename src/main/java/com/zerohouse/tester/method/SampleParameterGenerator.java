@@ -1,4 +1,4 @@
-package com.zerohouse.analyzer.method;
+package com.zerohouse.tester.method;
 
 import org.springframework.core.DefaultParameterNameDiscoverer;
 import org.springframework.core.ParameterNameDiscoverer;

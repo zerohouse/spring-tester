@@ -1,5 +1,10 @@
 var app = angular.module('app', ["ngPrettyJson", 'ngFileUpload']);
 app.controller('apiCtrl', function ($scope, $http) {
+
+    $scope.headers = typeof headers === "undefined" ? {} : headers;
+    $scope.apis = typeof apis === "undefined" ? [] : apis;
+    $scope.title = typeof title === "undefined" ? "" : title;
+
     $scope.selectApi = function (api) {
         $scope.apis.forEach(function (api) {
             api.select = false;
@@ -20,7 +25,7 @@ app.controller('apiCtrl', function ($scope, $http) {
     $scope.deleteHeader = function (key) {
         delete $scope.headers[key];
     };
-    $scope.headers = {};
+
     $scope.$watch('type', function (type) {
         switch (type) {
             case "json":
@@ -81,5 +86,4 @@ app.controller('apiCtrl', function ($scope, $http) {
         }
         return true;
     };
-    $scope.apis = apis;
 });
