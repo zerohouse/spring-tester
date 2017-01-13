@@ -652,10 +652,10 @@
         by Spring Tester</a></p>
     <div ng-show="selectedApi">
         <div class="block">
-            <h6>Header <span style="margin-left:30px;font-size:13px;" ng-click="newHeader()">new Header</span>
-            </h6>
+            <h6>Header <strong style="margin-left:30px;font-size:13px;" ng-click="newHeader()">+ add New Header</strong></h6>
             <div ng-repeat="(key, header) in headers">
-                <label>{{key}} <span style="color:#777; margin-left:30px" ng-click="deleteHeader(key)">Delete</span></label>
+                <label>{{key}} <span style="color:#777; margin-left:30px"
+                                     ng-click="deleteHeader(key)">Delete</span></label>
                 <input type="text" placeholder="value"
                        ng-model="headers[key]"
                        class="u-full-width">
