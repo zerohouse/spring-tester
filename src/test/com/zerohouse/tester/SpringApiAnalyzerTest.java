@@ -7,7 +7,7 @@ public class SpringApiAnalyzerTest {
     public void generateTestPage() throws Exception {
         SpringApiTester springApiTester = new SpringApiTester("com.zerohouse");
         springApiTester.setTitle("편돌이");
-        springApiTester.getDefaultHeaders().put("asdf", "asdf");
+        springApiTester.putDefaultHttpHeader("asdf", "asdf");
         springApiTester.generateTestPageHtml("test.html");
     }
 
