@@ -6,10 +6,13 @@ app.controller('apiCtrl', function ($scope, $http) {
     $scope.tableHeaders = typeof tableHeaders === "undefined" ? {
             name: "Name",
             url: "URL",
-            method: "Method"
+            methodsString: "Method"
         } : tableHeaders;
     $scope.apis = typeof apis === "undefined" ? [] : apis;
     $scope.title = typeof title === "undefined" ? "" : title;
+    $scope.apis.forEach(function (api) {
+        api.methodsString = api.methods.join(", ");
+    });
 
     $scope.selectApi = function (api) {
         $scope.apis.forEach(function (api) {
@@ -24,9 +27,10 @@ app.controller('apiCtrl', function ($scope, $http) {
         if ($scope.selectedApi.json) {
             $scope.type = 'json';
         }
-        if (!$scope.selectedApi.method) {
+        if ($scope.selectedApi.methods.length == 0) {
             $scope.selectedApi.method = 'GET';
-        }
+        } else
+            $scope.selectedApi.method = $scope.selectedApi.methods[0];
     };
     $scope.newHeader = function () {
         $scope.headers[prompt("Key?")] = "";

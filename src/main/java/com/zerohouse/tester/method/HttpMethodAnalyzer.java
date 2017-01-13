@@ -10,7 +10,6 @@ public class HttpMethodAnalyzer implements MethodAnalyzer {
     @Override
     public void analyze(Method method, Map apiAnalysis) {
         RequestMapping methodAnnotation = method.getAnnotation(RequestMapping.class);
-        if (methodAnnotation.method().length != 0)
-            apiAnalysis.put("method", methodAnnotation.method()[0]);
+        apiAnalysis.put("methods", methodAnnotation.method());
     }
 }
