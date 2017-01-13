@@ -33,7 +33,7 @@ public class ParameterNamesGenerator implements MethodAnalyzer {
                     continue;
                 if (ignoreClasses.stream().anyMatch(aClass -> aClass.equals(parameter.getType())))
                     continue;
-                paramNames.add(parameterNameDiscoverer.getParameterNames(method)[i]);
+                paramNames.add(method.getParameters()[i].getType().getSimpleName() + " " + parameterNameDiscoverer.getParameterNames(method)[i]);
             }
             apiAnalysis.put("paramNames", paramNames.stream().collect(Collectors.joining(", ")));
             return;
