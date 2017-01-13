@@ -3,7 +3,7 @@ app.controller('apiCtrl', function ($scope, $http) {
 
     $scope.headers = typeof headers === "undefined" ? {} : headers;
     $scope.tableHeaders = typeof tableHeaders === "undefined" ? {
-            name: "이름",
+            name: "Name",
             url: "URL",
             method: "Method"
         } : tableHeaders;
@@ -25,7 +25,7 @@ app.controller('apiCtrl', function ($scope, $http) {
         }
     };
     $scope.newHeader = function () {
-        $scope.headers[prompt("헤더 키값")] = "";
+        $scope.headers[prompt("Key?")] = "";
     };
     $scope.deleteHeader = function (key) {
         delete $scope.headers[key];

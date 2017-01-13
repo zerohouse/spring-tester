@@ -652,10 +652,10 @@
         by Spring Tester</a></p>
     <div ng-show="selectedApi">
         <div class="block">
-            <h6>헤더 <span style="margin-left:30px;font-size:13px;" ng-click="newHeader()">헤더 추가</span>
+            <h6>Header <span style="margin-left:30px;font-size:13px;" ng-click="newHeader()">new Header</span>
             </h6>
             <div ng-repeat="(key, header) in headers">
-                <label>{{key}} <span style="color:#777; margin-left:30px" ng-click="deleteHeader(key)">삭제</span></label>
+                <label>{{key}} <span style="color:#777; margin-left:30px" ng-click="deleteHeader(key)">Delete</span></label>
                 <input type="text" placeholder="value"
                        ng-model="headers[key]"
                        class="u-full-width">
@@ -665,14 +665,14 @@
         <h5>{{selectedApi.description}}</h5>
         <div class="margin-bottom-20" ng-bind-html="selectedApi.optional"></div>
         <div ng-if="selectedApi.parameter" class="block">
-            <h6>파라미터 {{selectedApi.contentType}} <span ng-if="isEmpty(selectedApi.parameter)">없음</span></h6>
+            <h6>Parameters {{selectedApi.contentType}}</h6>
             <div ng-switch="type">
             <pre ng-switch-when="json" pretty-json="selectedApi.parameter"
                  edition="true"></pre>
                 <div ng-switch-when="form">
                     <div ng-repeat="(key, parameter) in selectedApi.parameter">
                         <label>{{key}} <span ngf-select ng-model="selectedApi.parameter[key]"
-                                             style="margin-left:30px; color:#777;">파일선택</span></label>
+                                             style="margin-left:30px; color:#777;">Select File</span></label>
                         <input type="text" ng-if="!isFile[key]" placeholder="{{key}}"
                                ng-model="selectedApi.parameter[key]"
                                class="u-full-width">
@@ -706,16 +706,16 @@
                 <span class="label-body">json</span>
             </label>
         </div>
-        <button class="button-primary" ng-click="sendApi(selectedApi)">테스트 요청 보내기</button>
+        <button class="button-primary" ng-click="sendApi(selectedApi)">Send Request</button>
 
         <div ng-if="response" class="block">
-            <h5>회신</h5>
+            <h5>Response</h5>
             <pre pretty-json="response"></pre>
         </div>
     </div>
 
     <div class="block">
-        <label>API 목록</label>
+        <label>API List</label>
         <input class="u-full-width" type="text" placeholder="검색" ng-model="keyword">
 
         <table class="u-full-width">
