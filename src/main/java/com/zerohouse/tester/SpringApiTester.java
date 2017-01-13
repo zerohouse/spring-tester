@@ -72,8 +72,12 @@ public class SpringApiTester {
         return html;
     }
 
-    public void generateTestPageHtml(String path) throws IOException {
-        FileUtils.writeStringToFile(new File(path), getTestPageHtml(), "utf8");
+    public void generateTestPageHtml(String path) {
+        try {
+            FileUtils.writeStringToFile(new File(path), getTestPageHtml(), "utf8");
+        } catch (IOException e) {
+            e.printStackTrace();
+        }
     }
 
     private String getStringFromFile(String path) throws IOException {
