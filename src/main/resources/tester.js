@@ -1,6 +1,7 @@
 var app = angular.module('app', ["ngPrettyJson", 'ngFileUpload']);
 app.controller('apiCtrl', function ($scope, $http) {
 
+    $scope.methods = ['GET', 'HEAD', 'POST', 'PUT', 'PATCH', 'DELETE', 'OPTIONS', 'TRACE'];
     $scope.headers = typeof headers === "undefined" ? {} : headers;
     $scope.tableHeaders = typeof tableHeaders === "undefined" ? {
             name: "Name",
@@ -20,8 +21,11 @@ app.controller('apiCtrl', function ($scope, $http) {
 
         angular.copy(api, $scope.selectedApi);
         $scope.response = null;
-        if (api.json) {
+        if ($scope.selectedApi.json) {
             $scope.type = 'json';
+        }
+        if (!$scope.selectedApi.method) {
+            $scope.selectedApi.method = 'GET';
         }
     };
     $scope.newHeader = function () {

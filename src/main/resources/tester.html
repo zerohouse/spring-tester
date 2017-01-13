@@ -652,7 +652,8 @@
         by Spring Tester</a></p>
     <div ng-show="selectedApi">
         <div class="block">
-            <h6>Header <strong style="margin-left:30px;font-size:13px;" ng-click="newHeader()">+ add New Header</strong></h6>
+            <h6>Header <strong style="margin-left:30px;font-size:13px;" ng-click="newHeader()">+ add New Header</strong>
+            </h6>
             <div ng-repeat="(key, header) in headers">
                 <label>{{key}} <span style="color:#777; margin-left:30px"
                                      ng-click="deleteHeader(key)">Delete</span></label>
@@ -706,7 +707,10 @@
                 <span class="label-body">json</span>
             </label>
         </div>
-        <button class="button-primary" ng-click="sendApi(selectedApi)">Send Request</button>
+        <div>
+            <select ng-options="method as method for method in methods" ng-model="selectedApi.method"></select>
+            <button class="button-primary" ng-click="sendApi(selectedApi)">Send Request</button>
+        </div>
 
         <div ng-if="response" class="block">
             <h5>Response</h5>
