@@ -726,7 +726,7 @@
             </thead>
             <tbody>
             <tr ng-class="{active:api.select}" ng-repeat="api in apis | filter:keyword" ng-click="selectApi(api)">
-                <td ng-repeat="(key,tableHeader) in tableHeaders" ng-bind-html="api[key]"></td>
+                <td ng-repeat="(key,tableHeader) in tableHeaders">{{api[key]}}</td>
             </tr>
             </tbody>
         </table>
