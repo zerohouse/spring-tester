@@ -46,10 +46,10 @@ public class SpringApiTester {
         objectMapper = new ObjectMapper();
         httpHeaders = new HashMap<>();
         tableHeaders = new HashMap<>();
-        httpHeaders.put("name", "이름");
-        httpHeaders.put("url", "Url");
-        httpHeaders.put("method", "Method");
-        httpHeaders.put("paramNames", "Parameters");
+        tableHeaders.put("name", "이름");
+        tableHeaders.put("url", "Url");
+        tableHeaders.put("method", "Method");
+        tableHeaders.put("paramNames", "Parameters");
 
         this.packagePath = packagePath;
         ignoreAnnotations = new ArrayList<>();
