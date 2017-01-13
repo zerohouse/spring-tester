@@ -48,7 +48,7 @@ public class SpringApiTester {
         tableHeaders = new LinkedHashMap<>();
         tableHeaders.put("name", "Name");
         tableHeaders.put("url", "Url");
-        tableHeaders.put("method", "Method");
+        tableHeaders.put("methodsString", "Method");
         tableHeaders.put("paramNames", "Parameters");
 
         this.packagePath = packagePath;
