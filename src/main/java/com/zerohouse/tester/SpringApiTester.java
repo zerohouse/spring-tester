@@ -50,11 +50,11 @@ public class SpringApiTester {
 
         defaultValues.put(String.class, "");
         defaultValues.put(Integer.class, 0);
-        defaultValues.put(Double.class, 0);
-        defaultValues.put(Long.class, 0);
-        defaultValues.put(Float.class, 0);
+        defaultValues.put(Double.class, 0d);
+        defaultValues.put(Long.class, 0L);
+        defaultValues.put(Float.class, 0f);
         defaultValues.put(Boolean.class, false);
-        defaultValues.put(Date.class, null);
+        defaultValues.put(Date.class, new Date());
         defaultValues.put(List.class, new ArrayList<>());
         defaultValues.put(Map.class, new HashMap<>());
 
