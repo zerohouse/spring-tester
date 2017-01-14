@@ -11,6 +11,7 @@ app.controller('apiCtrl', function ($scope, $http) {
         } : tableHeaders;
     $scope.apis = typeof apis === "undefined" ? [{
             "paramNames": "UserDetailDto (JSON)",
+            "name": "userUpdate",
             "methods": ["POST"],
             "parameter": {
                 "userInformation": null,

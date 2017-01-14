@@ -37,7 +37,7 @@ public class SpringApiTester {
     }
 
     Map<String, String> tableHeaders;
-
+    Map<Class, Object> defaultValues;
 
     public SpringApiTester() {
     }
@@ -46,6 +46,18 @@ public class SpringApiTester {
         objectMapper = new ObjectMapper();
         httpHeaders = new LinkedHashMap<>();
         tableHeaders = new LinkedHashMap<>();
+        defaultValues = new HashMap<>();
+
+        defaultValues.put(String.class, "");
+        defaultValues.put(Integer.class, 0);
+        defaultValues.put(Double.class, 0);
+        defaultValues.put(Long.class, 0);
+        defaultValues.put(Float.class, 0);
+        defaultValues.put(Boolean.class, false);
+        defaultValues.put(Date.class, null);
+        defaultValues.put(List.class, new ArrayList<>());
+        defaultValues.put(Map.class, new HashMap<>());
+
         tableHeaders.put("value", "Name");
         tableHeaders.put("url", "Url");
         tableHeaders.put("methodsString", "Method");
@@ -58,7 +70,7 @@ public class SpringApiTester {
         methodAnalyzers.add(new UrlAnalyzer());
         methodAnalyzers.add(new HttpMethodAnalyzer());
         methodAnalyzers.add(new ApiDescriptionAnalyzer());
-        methodAnalyzers.add(new SampleParameterGenerator(ignoreAnnotations, ignoreClasses));
+        methodAnalyzers.add(new SampleParameterGenerator(ignoreAnnotations, ignoreClasses, defaultValues));
         methodAnalyzers.add(new ParameterNamesGenerator(ignoreAnnotations, ignoreClasses));
     }
 
@@ -114,6 +126,10 @@ public class SpringApiTester {
 
     public void addMethodAnalyzer(MethodAnalyzer methodAnalyzer) {
         methodAnalyzers.add(methodAnalyzer);
+    }
+
+    public void putDefaultValue(Class aClass, Object value) {
+        defaultValues.put(aClass, value);
     }
 
     public void setTitle(String title) {

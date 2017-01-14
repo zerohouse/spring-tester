@@ -4,6 +4,7 @@ import org.springframework.core.DefaultParameterNameDiscoverer;
 import org.springframework.core.ParameterNameDiscoverer;
 import org.springframework.web.bind.annotation.RequestBody;
 
+import java.lang.reflect.InvocationTargetException;
 import java.lang.reflect.Method;
 import java.lang.reflect.Parameter;
 import java.util.*;
@@ -12,10 +13,12 @@ public class SampleParameterGenerator implements MethodAnalyzer {
 
     List<Class> ignoreAnnotations;
     List<Class> ignoreClasses;
+    Map<Class, Object> defaultValues;
 
-    public SampleParameterGenerator(List<Class> ignoreAnnotations, List<Class> ignoreClasses) {
+    public SampleParameterGenerator(List<Class> ignoreAnnotations, List<Class> ignoreClasses, Map<Class, Object> defaultValues) {
         this.ignoreAnnotations = ignoreAnnotations;
         this.ignoreClasses = ignoreClasses;
+        this.defaultValues = defaultValues;
     }
 
     @Override
@@ -35,16 +38,32 @@ public class SampleParameterGenerator implements MethodAnalyzer {
             return;
         }
         Parameter find = Arrays.stream(method.getParameters()).filter(parameter -> parameter.isAnnotationPresent(RequestBody.class)).findAny().get();
+        apiAnalysis.put("json", true);
+        if (find.getType() == List.class || find.getType().isArray())
+            apiAnalysis.put("parameter", new ArrayList<>());
+        else if (find.getType() == Map.class)
+            apiAnalysis.put("parameter", new HashMap<>());
+        else
+            apiAnalysis.put("parameter", makeInstance(find.getType()));
+    }
+
+    Object makeInstance(Class<?> type) {
         try {
-            apiAnalysis.put("json", true);
-            if (find.getType() == List.class || find.getType().isArray())
-                apiAnalysis.put("parameter", new ArrayList<>());
-            else if (find.getType() == Map.class)
-                apiAnalysis.put("parameter", new HashMap<>());
-            else
-                apiAnalysis.put("parameter", find.getType().newInstance());
-        } catch (InstantiationException | IllegalAccessException e) {
+            if (defaultValues.get(type) != null)
+                return defaultValues.get(type);
+            Object o = type.getConstructor().newInstance();
+            Arrays.stream(type.getDeclaredFields()).forEach(field -> {
+                field.setAccessible(true);
+                try {
+                    field.set(o, makeInstance(field.getType()));
+                } catch (IllegalAccessException e) {
+                    e.printStackTrace();
+                }
+            });
+            return o;
+        } catch (NoSuchMethodException | InvocationTargetException | IllegalAccessException | InstantiationException e) {
             e.printStackTrace();
         }
+        return null;
     }
 }
