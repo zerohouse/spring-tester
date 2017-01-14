@@ -637,7 +637,7 @@
 
         .block {
             margin: 20px 0;
-            padding: 20px 0
+            padding: 20px 0;
         }
 
         [ng-click] {
@@ -665,11 +665,26 @@
 
         <h5>{{selectedApi.description}}</h5>
         <div class="margin-bottom-20" ng-bind-html="selectedApi.optional"></div>
-        <div ng-if="selectedApi.parameter" class="block">
-            <h6>Parameters {{selectedApi.contentType}}</h6>
+        <div class="block">
+            <h6>Parameters</h6>
+
+            <div ng-show="method!=='GET' && method!=='DELETE'">
+                <label>
+                    <input type="radio" name="type" value="form" ng-model="type">
+                    <span class="label-body">form-data</span>
+                </label>
+                <label>
+                    <input type="radio" name="type" value="urlencoded" ng-model="type">
+                    <span class="label-body">x-www-form-urlencoded</span>
+                </label>
+                <label>
+                    <input type="radio" name="type" value="json" ng-model="type">
+                    <span class="label-body">json</span>
+                </label>
+            </div>
+
             <div ng-switch="type">
-            <pre ng-switch-when="json" pretty-json="selectedApi.parameter"
-                 edition="true"></pre>
+                <pre ng-switch-when="json" pretty-json="selectedApi.parameter" edition="true"></pre>
                 <div ng-switch-when="form">
                     <div ng-repeat="(key, parameter) in selectedApi.parameter">
                         <label>{{key}} <span ngf-select ng-model="selectedApi.parameter[key]"
@@ -678,37 +693,25 @@
                                ng-model="selectedApi.parameter[key]"
                                class="u-full-width">
                     </div>
+                    <strong style="font-size:13px;" ng-click="newParameter()">+ add New Parameter</strong>
                 </div>
                 <div ng-switch-default>
                     <div class="margin-bottom-20">
-                    <span ng-repeat="(key, parameter) in selectedApi.parameter">
-                        {{key}}={{parameter}}<span ng-if="!$last">&</span></span>
+                        <span ng-repeat="(key, parameter) in selectedApi.parameter"><strong>{{key}}</strong>=<span
+                                style="color:green">{{parameter}}</span><span ng-if="!$last">&</span></span>
                     </div>
                     <div ng-repeat="(key, parameter) in selectedApi.parameter" class="input-group">
                         <label>{{key}}</label>
                         <input type="text" placeholder="{{key}}" ng-model="selectedApi.parameter[key]"
                                class="u-full-width">
                     </div>
+                    <strong style="font-size:13px;" ng-click="newParameter()">+ add New Parameter</strong>
                 </div>
             </div>
         </div>
 
-        <div ng-show="selectedApi.method!=='GET' && selectedApi.method!=='DELETE'">
-            <label>
-                <input type="radio" name="type" value="form" ng-model="type">
-                <span class="label-body">form-data</span>
-            </label>
-            <label>
-                <input type="radio" name="type" value="urlencoded" ng-model="type">
-                <span class="label-body">x-www-form-urlencoded</span>
-            </label>
-            <label>
-                <input type="radio" name="type" value="json" ng-model="type">
-                <span class="label-body">json</span>
-            </label>
-        </div>
         <div>
-            <select ng-options="method as method for method in methods" ng-model="selectedApi.method"></select>
+            <select ng-options="method as method for method in methods" ng-model="method"></select>
             <button class="button-primary" ng-click="sendApi(selectedApi)">Send Request</button>
         </div>
 

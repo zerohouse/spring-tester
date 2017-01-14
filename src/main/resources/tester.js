@@ -1,6 +1,7 @@
 var app = angular.module('app', ["ngPrettyJson", 'ngFileUpload']);
 app.controller('apiCtrl', function ($scope, $http) {
 
+    $scope.type = 'urlencoded';
     $scope.methods = ['GET', 'HEAD', 'POST', 'PUT', 'PATCH', 'DELETE', 'OPTIONS', 'TRACE'];
     $scope.headers = typeof headers === "undefined" ? {} : headers;
     $scope.tableHeaders = typeof tableHeaders === "undefined" ? {
@@ -8,10 +9,47 @@ app.controller('apiCtrl', function ($scope, $http) {
             url: "URL",
             methodsString: "Method"
         } : tableHeaders;
-    $scope.apis = typeof apis === "undefined" ? [] : apis;
+    $scope.apis = typeof apis === "undefined" ? [{
+            "paramNames": "UserDetailDto (JSON)",
+            "methods": ["POST"],
+            "parameter": {
+                "id": null,
+                "createdAt": null,
+                "updatedAt": null,
+                "email": null,
+                "accessId": null,
+                "gender": null,
+                "userLevel": null,
+                "userStatus": null,
+                "score": null,
+                "cash": null,
+                "voiceFile": null,
+                "userInformation": null,
+                "userInformationRequested": null
+            },
+            "json": true,
+            "url": "/api/v1/admin/user",
+            "methodsString": "POST",
+            "$$hashKey": "object:15",
+            "select": false
+        }, {
+            "paramNames": "",
+            "methods": [],
+            "parameter": {},
+            "url": "/api/v1/user/assess/again",
+            "methodsString": "",
+            "$$hashKey": "object:16",
+            "select": false
+        }] : apis;
     $scope.title = typeof title === "undefined" ? "" : title;
     $scope.apis.forEach(function (api) {
         api.methodsString = api.methods.join(", ");
+    });
+
+    $scope.$watch('method', function (method) {
+        if (method === "GET" || method === "DELETE") {
+            $scope.type = 'urlencoded';
+        }
     });
 
     $scope.selectApi = function (api) {
@@ -28,18 +66,22 @@ app.controller('apiCtrl', function ($scope, $http) {
             $scope.type = 'json';
         }
         if ($scope.selectedApi.methods.length == 0) {
-            $scope.selectedApi.method = 'GET';
+            $scope.method = 'GET';
         } else
-            $scope.selectedApi.method = $scope.selectedApi.methods[0];
+            $scope.method = $scope.selectedApi.methods[0];
     };
     $scope.newHeader = function () {
         $scope.headers[prompt("Key?")] = "";
+    };
+    $scope.newParameter = function () {
+        $scope.selectedApi.parameter[prompt("Key?")] = "";
     };
     $scope.deleteHeader = function (key) {
         delete $scope.headers[key];
     };
 
     $scope.$watch('type', function (type) {
+        console.log(type);
         switch (type) {
             case "json":
                 $scope.headers['Content-Type'] = 'application/json';

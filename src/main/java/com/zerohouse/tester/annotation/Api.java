@@ -8,9 +8,9 @@ import java.lang.annotation.Target;
 
 @Target({ElementType.METHOD})
 @Retention(RetentionPolicy.RUNTIME)
-public @interface ApiDescription {
+public @interface Api {
 
-    String name() default "";
+    String value();
 
     String description() default "";
 
