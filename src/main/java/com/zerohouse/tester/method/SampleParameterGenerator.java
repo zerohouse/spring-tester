@@ -15,12 +15,6 @@ public class SampleParameterGenerator implements MethodAnalyzer {
     List<Class> ignoreClasses;
     Map<Class, Object> defaultValues;
 
-    public void setDefaultLevel(Integer defaultLevel) {
-        this.defaultLevel = defaultLevel;
-    }
-
-    private Integer defaultLevel = 2;
-
     public SampleParameterGenerator(List<Class> ignoreAnnotations, List<Class> ignoreClasses, Map<Class, Object> defaultValues) {
         this.ignoreAnnotations = ignoreAnnotations;
         this.ignoreClasses = ignoreClasses;
@@ -50,30 +44,10 @@ public class SampleParameterGenerator implements MethodAnalyzer {
         else if (find.getType() == Map.class)
             apiAnalysis.put("parameter", new HashMap<>());
         else
-            apiAnalysis.put("parameter", makeInstance(find.getType(), 0));
-    }
-
-    Object makeInstance(Class<?> type, Integer level) {
-        try {
-            if (defaultValues.get(type) != null)
-                return defaultValues.get(type);
-            if (level > defaultLevel)
-                return null;
-            Object o = type.getConstructor().newInstance();
-            level++;
-            Integer finalLevel = level;
-            Arrays.stream(type.getDeclaredFields()).forEach(field -> {
-                field.setAccessible(true);
-                try {
-                    field.set(o, makeInstance(field.getType(), finalLevel));
-                } catch (IllegalAccessException e) {
-                    e.printStackTrace();
-                }
-            });
-            return o;
-        } catch (NoSuchMethodException | InvocationTargetException | IllegalAccessException | InstantiationException e) {
-            e.printStackTrace();
-        }
-        return null;
+            try {
+                apiAnalysis.put("parameter", find.getType().newInstance());
+            } catch (InstantiationException | IllegalAccessException e) {
+                e.printStackTrace();
+            }
     }
 }
