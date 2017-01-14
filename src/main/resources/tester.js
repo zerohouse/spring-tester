@@ -13,24 +13,12 @@ app.controller('apiCtrl', function ($scope, $http) {
             "paramNames": "UserDetailDto (JSON)",
             "methods": ["POST"],
             "parameter": {
-                "id": null,
-                "createdAt": null,
-                "updatedAt": null,
-                "email": null,
-                "accessId": null,
-                "gender": null,
-                "userLevel": null,
-                "userStatus": null,
-                "score": null,
-                "cash": null,
-                "voiceFile": null,
                 "userInformation": null,
                 "userInformationRequested": null
             },
             "json": true,
             "url": "/api/v1/admin/user",
             "methodsString": "POST",
-            "$$hashKey": "object:15",
             "select": false
         }, {
             "paramNames": "",
@@ -38,7 +26,6 @@ app.controller('apiCtrl', function ($scope, $http) {
             "parameter": {},
             "url": "/api/v1/user/assess/again",
             "methodsString": "",
-            "$$hashKey": "object:16",
             "select": false
         }] : apis;
     $scope.title = typeof title === "undefined" ? "" : title;
@@ -81,7 +68,6 @@ app.controller('apiCtrl', function ($scope, $http) {
     };
 
     $scope.$watch('type', function (type) {
-        console.log(type);
         switch (type) {
             case "json":
                 $scope.headers['Content-Type'] = 'application/json';
@@ -93,12 +79,12 @@ app.controller('apiCtrl', function ($scope, $http) {
                 delete $scope.headers['Content-Type'];
         }
     });
-    $scope.$watch('selectedApi.method', function (method) {
+    $scope.$watch('method', function (method) {
         if (method === "GET" || method === "DELETE")
             $scope.type = 'urlencoded';
     });
     $scope.sendApi = function (api) {
-        var method = api.method;
+        var method = $scope.method;
         var options = {
             method: method, url: api.url
         };
