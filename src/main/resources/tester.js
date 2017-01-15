@@ -10,24 +10,14 @@ app.controller('apiCtrl', function ($scope, $http) {
             methodsString: "Method"
         } : tableHeaders;
     $scope.apis = typeof apis === "undefined" ? [{
-            "paramNames": "UserDetailDto (JSON)",
-            "name": "userUpdate",
-            "methods": ["POST"],
-            "parameter": {
-                "userInformation": null,
-                "userInformationRequested": null
-            },
-            "json": true,
-            "url": "/api/v1/admin/user",
-            "methodsString": "POST",
-            "select": false
-        }, {
-            "paramNames": "",
+            "paramNames": "String email",
             "methods": [],
-            "parameter": {},
-            "url": "/api/v1/user/assess/again",
+            "parameter": {"email": ""},
+            "description": "",
+            "value": "임시비번요청",
+            "url": "/api/v1/user/tempPasswordRequest",
             "methodsString": "",
-            "select": false
+            "$$hashKey": "object:26"
         }] : apis;
     $scope.title = typeof title === "undefined" ? "" : title;
     $scope.apis.forEach(function (api) {
@@ -92,7 +82,7 @@ app.controller('apiCtrl', function ($scope, $http) {
         options.headers = $scope.headers;
         if (method === "GET" || method === "DELETE") {
             options.url += "?dc=" + new Date().getTime().toString();
-            options.parameter = api.parameter;
+            options.params = api.parameter;
         } else if ($scope.type === "json")
             options.data = api.parameter;
         else if ($scope.type === "form") {
