@@ -28,7 +28,7 @@
      <dependency>
          <groupId>com.github.zerohouse</groupId>
          <artifactId>spring-tester</artifactId>
-         <version>0.2.9</version>
+         <version>0.3.2</version>
      </dependency>
     
    
