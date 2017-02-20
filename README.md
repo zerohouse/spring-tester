@@ -6,7 +6,9 @@
 
 Generate Spring MVC API Test Page
 
-[DEMO](https://raw.githubusercontent.com/zerohouse/spring-tester/master/test.html)
+Mapping Path : /api/testPage
+
+[DEMO](https://rawgit.com/zerohouse/spring-tester/master/test.html)
     
 ### Usage
     
