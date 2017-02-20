@@ -2,17 +2,29 @@
 
     
     
-### generate example
+
+
+Generate Spring MVC API Test Page
+
+[DEMO](https://raw.githubusercontent.com/zerohouse/spring-tester/master/test.html)
+    
+### Usage
+    
     @Configuration
-    @EnableWebMvc
-    @EnableSpringDataWebSupport
-    public class WebConfig extends WebMvcConfigurerAdapter {
+    public class Config implements BeanDefinitionRegistryPostProcessor {
+    
         @Override
-        public void addResourceHandlers(ResourceHandlerRegistry registry) {
-            SpringApiTester apiTester = new SpringApiTester("com.pd");
-            apiTester.addParameterIgnoreAnnotation(Logged.class);
-            apiTester.generateTestPageHtml("/test/testPage.html");
-            registry.addResourceHandler("/api/test/**").addResourceLocations("file:/test/");
+        public void postProcessBeanDefinitionRegistry(BeanDefinitionRegistry beanDefinitionRegistry) throws BeansException {
+            SpringApiTester apiTester = new SpringApiTester("com.funny.production");
+            apiTester.addParameterIgnoreAnnotation(Connected.class);
+            apiTester.setTitle("API 테스트 페이지");
+            apiTester.putHttpHeader("AccessId", "");
+            apiTester.register(beanDefinitionRegistry);
+        }
+    
+        @Override
+        public void postProcessBeanFactory(ConfigurableListableBeanFactory configurableListableBeanFactory) throws BeansException {
+    
         }
     }
     
@@ -28,7 +40,7 @@
      <dependency>
          <groupId>com.github.zerohouse</groupId>
          <artifactId>spring-tester</artifactId>
-         <version>0.3.2</version>
+         <version>0.3.3</version>
      </dependency>
     
    
