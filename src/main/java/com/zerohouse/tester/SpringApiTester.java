@@ -1,6 +1,7 @@
 package com.zerohouse.tester;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
+import com.zerohouse.tester.controller.SpringTesterController;
 import com.zerohouse.tester.method.*;
 import org.apache.commons.io.FileUtils;
 import org.apache.commons.io.IOUtils;
@@ -9,6 +10,10 @@ import org.reflections.scanners.MethodAnnotationsScanner;
 import org.reflections.scanners.SubTypesScanner;
 import org.reflections.scanners.TypeAnnotationsScanner;
 import org.reflections.util.ClasspathHelper;
+import org.springframework.beans.factory.config.BeanDefinition;
+import org.springframework.beans.factory.config.ConstructorArgumentValues;
+import org.springframework.beans.factory.support.BeanDefinitionRegistry;
+import org.springframework.beans.factory.support.RootBeanDefinition;
 import org.springframework.web.bind.annotation.RequestMapping;
 
 import java.io.BufferedReader;
@@ -110,6 +115,16 @@ public class SpringApiTester {
             e.printStackTrace();
         }
     }
+
+    public void register(BeanDefinitionRegistry beanDefinitionRegistry) {
+        ConstructorArgumentValues constructorArgumentValues = new ConstructorArgumentValues();
+        constructorArgumentValues.addGenericArgumentValue(this);
+        BeanDefinition beanDefinition = new RootBeanDefinition(SpringTesterController.class, constructorArgumentValues, null);
+        beanDefinitionRegistry.registerBeanDefinition("SpringTesterController", beanDefinition);
+    }
+
+
+
 
     private String getStringFromFile(String path) throws IOException {
         BufferedReader txtReader = new BufferedReader(new InputStreamReader(getClass().getResourceAsStream(path)));
