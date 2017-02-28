@@ -657,7 +657,7 @@
 
         <div ng-if="selectedApi.description">
             <h6>Api 설명</h6>
-            <p ng-bind-html="selectedApi.description"></p>
+            <p ng-bind-html="selectedApi.description | trust"></p>
         </div>
 
         <div class="block">

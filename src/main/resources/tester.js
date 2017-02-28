@@ -1,4 +1,12 @@
 var app = angular.module('app', ["ngPrettyJson", 'ngFileUpload']);
+app.filter('trust', [
+    '$sce',
+    function ($sce) {
+        return function (value, type) {
+            return $sce.trustAs(type || 'html', value);
+        };
+    }
+]);
 app.controller('apiCtrl', function ($scope, $http) {
 
     $scope.type = 'urlencoded';
