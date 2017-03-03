@@ -8,7 +8,14 @@ app.filter('trust', [
     }
 ]);
 app.controller('apiCtrl', function ($scope, $http) {
-
+    $scope.order = {};
+    $scope.orderBy = function (order) {
+        if ($scope.order.order === order) {
+            $scope.order.desc = !$scope.order.desc;
+            return;
+        }
+        $scope.order.order = order;
+    };
     $scope.type = 'urlencoded';
     $scope.methods = ['GET', 'HEAD', 'POST', 'PUT', 'PATCH', 'DELETE', 'OPTIONS', 'TRACE'];
     $scope.headers = typeof headers === "undefined" ? {} : headers;
@@ -17,16 +24,10 @@ app.controller('apiCtrl', function ($scope, $http) {
             url: "URL",
             methodsString: "Method"
         } : tableHeaders;
-    $scope.apis = typeof apis === "undefined" ? [{
-            "paramNames": "String email",
-            "methods": [],
-            "parameter": {"email": ""},
-            "description": "",
-            "value": "임시비번요청",
-            "url": "/api/v1/user/tempPasswordRequest",
-            "methodsString": "",
-            "$$hashKey": "object:26"
-        }] : apis;
+    if ($scope.tableHeaders) {
+        $scope.order.order = Object.keys($scope.tableHeaders)[0];
+    }
+    $scope.apis = typeof apis === "undefined" ? [] : apis;
     $scope.title = typeof title === "undefined" ? "" : title;
     $scope.apis.forEach(function (api) {
         api.methodsString = api.methods.join(", ");

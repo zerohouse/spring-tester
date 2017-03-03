@@ -736,11 +736,16 @@
         <table class="u-full-width">
             <thead>
             <tr>
-                <th ng-repeat="(key,tableHeader) in tableHeaders">{{tableHeader}}</th>
+                <th ng-click="orderBy(key)" ng-repeat="(key,tableHeader) in tableHeaders">{{tableHeader}}
+                    <span ng-if="order.order===key">
+                        <span style="color: red" ng-if="!order.desc">+</span>
+                        <span style="color: blue" ng-if="order.desc">-</span>
+                    </span>
+                </th>
             </tr>
             </thead>
             <tbody>
-            <tr ng-class="{active:api.select}" ng-repeat="api in apis | filter:keyword" ng-click="selectApi(api)">
+            <tr ng-class="{active:api.select}" ng-repeat="api in apis | filter:keyword | orderBy:order.order:order.desc" ng-click="selectApi(api)">
                 <td ng-repeat="(key,tableHeader) in tableHeaders">{{api[key]}}</td>
             </tr>
             </tbody>
