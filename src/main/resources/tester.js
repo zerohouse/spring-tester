@@ -31,7 +31,7 @@ app.controller('apiCtrl', function ($scope, $http) {
     $scope.title = typeof title === "undefined" ? "" : title;
     $scope.apis.forEach(function (api) {
         api.methodsString = api.methods.join(", ");
-        if (api.parameter)
+        if (!api.parameter)
             api.parameter = {};
     });
 
