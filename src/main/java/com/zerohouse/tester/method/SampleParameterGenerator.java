@@ -27,6 +27,8 @@ public class SampleParameterGenerator implements MethodAnalyzer {
 
     @Override
     public void analyze(Method method, Map apiAnalysis) {
+        Parameter find = Arrays.stream(method.getParameters()).filter(parameter -> parameter.isAnnotationPresent(RequestBody.class)).findAny().get();
+        apiAnalysis.put("json", true);
         if (method.isAnnotationPresent(Api.class)) {
             Api apiDescription = method.getAnnotation(Api.class);
             if (!"".equals(apiDescription.parameter())) {
@@ -53,8 +55,6 @@ public class SampleParameterGenerator implements MethodAnalyzer {
             apiAnalysis.put("parameter", params);
             return;
         }
-        Parameter find = Arrays.stream(method.getParameters()).filter(parameter -> parameter.isAnnotationPresent(RequestBody.class)).findAny().get();
-        apiAnalysis.put("json", true);
         if (find.getType() == List.class || find.getType().isArray())
             apiAnalysis.put("parameter", new ArrayList<>());
         else if (find.getType() == Map.class)
