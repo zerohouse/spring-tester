@@ -29,7 +29,7 @@ public class SampleParameterGenerator implements MethodAnalyzer {
         if (method.isAnnotationPresent(Api.class)) {
             Api apiDescription = method.getAnnotation(Api.class);
             if(!"".equals(apiDescription.parameter())){
-                apiAnalysis.put("parameter", objectMapper.convertValue(apiDescription.parameter(), apiDescription.parameterType()));
+                apiAnalysis.put("parameter", objectMapper.convertValue(apiDescription.parameter().replace("'","\""), apiDescription.parameterType()));
                 return;
             }
         }
