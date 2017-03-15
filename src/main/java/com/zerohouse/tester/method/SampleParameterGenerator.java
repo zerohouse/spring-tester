@@ -6,6 +6,7 @@ import org.springframework.core.DefaultParameterNameDiscoverer;
 import org.springframework.core.ParameterNameDiscoverer;
 import org.springframework.web.bind.annotation.RequestBody;
 
+import java.io.IOException;
 import java.lang.reflect.InvocationTargetException;
 import java.lang.reflect.Method;
 import java.lang.reflect.Parameter;
@@ -28,8 +29,13 @@ public class SampleParameterGenerator implements MethodAnalyzer {
     public void analyze(Method method, Map apiAnalysis) {
         if (method.isAnnotationPresent(Api.class)) {
             Api apiDescription = method.getAnnotation(Api.class);
-            if(!"".equals(apiDescription.parameter())){
-                apiAnalysis.put("parameter", objectMapper.convertValue(apiDescription.parameter().replace("'","\""), apiDescription.parameterType()));
+            if (!"".equals(apiDescription.parameter())) {
+                try {
+                    apiAnalysis.put("parameter", objectMapper.readValue(apiDescription.parameter().replace("'", "\""), apiDescription.parameterType()));
+                } catch (IOException e) {
+                    apiAnalysis.put("parameter", new HashMap<>());
+                    e.printStackTrace();
+                }
                 return;
             }
         }
