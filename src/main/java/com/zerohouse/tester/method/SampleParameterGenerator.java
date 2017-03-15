@@ -7,7 +7,6 @@ import org.springframework.core.ParameterNameDiscoverer;
 import org.springframework.web.bind.annotation.RequestBody;
 
 import java.io.IOException;
-import java.lang.reflect.InvocationTargetException;
 import java.lang.reflect.Method;
 import java.lang.reflect.Parameter;
 import java.util.*;
@@ -27,8 +26,11 @@ public class SampleParameterGenerator implements MethodAnalyzer {
 
     @Override
     public void analyze(Method method, Map apiAnalysis) {
-        Parameter find = Arrays.stream(method.getParameters()).filter(parameter -> parameter.isAnnotationPresent(RequestBody.class)).findAny().get();
-        apiAnalysis.put("json", true);
+        Optional<Parameter> optional = Arrays.stream(method.getParameters()).filter(parameter -> parameter.isAnnotationPresent(RequestBody.class)).findAny();
+        boolean json = optional.isPresent();
+        if(json)
+            apiAnalysis.put("json", true);
+
         if (method.isAnnotationPresent(Api.class)) {
             Api apiDescription = method.getAnnotation(Api.class);
             if (!"".equals(apiDescription.parameter())) {
@@ -41,7 +43,7 @@ public class SampleParameterGenerator implements MethodAnalyzer {
                 return;
             }
         }
-        if (!Arrays.stream(method.getParameters()).anyMatch(parameter -> parameter.isAnnotationPresent(RequestBody.class))) {
+        if (!json) {
             HashMap<String, String> params = new HashMap<>();
             ParameterNameDiscoverer parameterNameDiscoverer = new DefaultParameterNameDiscoverer();
             for (int i = 0; i < method.getParameters().length; i++) {
@@ -55,6 +57,7 @@ public class SampleParameterGenerator implements MethodAnalyzer {
             apiAnalysis.put("parameter", params);
             return;
         }
+        Parameter find = optional.get();
         if (find.getType() == List.class || find.getType().isArray())
             apiAnalysis.put("parameter", new ArrayList<>());
         else if (find.getType() == Map.class)
