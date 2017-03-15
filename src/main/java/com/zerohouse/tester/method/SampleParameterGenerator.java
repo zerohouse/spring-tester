@@ -1,5 +1,7 @@
 package com.zerohouse.tester.method;
 
+import com.fasterxml.jackson.databind.ObjectMapper;
+import com.zerohouse.tester.annotation.Api;
 import org.springframework.core.DefaultParameterNameDiscoverer;
 import org.springframework.core.ParameterNameDiscoverer;
 import org.springframework.web.bind.annotation.RequestBody;
@@ -14,6 +16,7 @@ public class SampleParameterGenerator implements MethodAnalyzer {
     List<Class> ignoreAnnotations;
     List<Class> ignoreClasses;
     Map<Class, Object> defaultValues;
+    ObjectMapper objectMapper = new ObjectMapper();
 
     public SampleParameterGenerator(List<Class> ignoreAnnotations, List<Class> ignoreClasses, Map<Class, Object> defaultValues) {
         this.ignoreAnnotations = ignoreAnnotations;
@@ -23,6 +26,13 @@ public class SampleParameterGenerator implements MethodAnalyzer {
 
     @Override
     public void analyze(Method method, Map apiAnalysis) {
+        if (method.isAnnotationPresent(Api.class)) {
+            Api apiDescription = method.getAnnotation(Api.class);
+            if(!"".equals(apiDescription.parameter())){
+                apiAnalysis.put("parameter", objectMapper.convertValue(apiDescription.parameter(), apiDescription.parameterType()));
+                return;
+            }
+        }
         if (!Arrays.stream(method.getParameters()).anyMatch(parameter -> parameter.isAnnotationPresent(RequestBody.class))) {
             HashMap<String, String> params = new HashMap<>();
             ParameterNameDiscoverer parameterNameDiscoverer = new DefaultParameterNameDiscoverer();
