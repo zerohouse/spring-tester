@@ -16,6 +16,8 @@ import org.springframework.beans.factory.support.BeanDefinitionRegistry;
 import org.springframework.beans.factory.support.RootBeanDefinition;
 import org.springframework.web.bind.annotation.RequestMapping;
 
+import javax.servlet.http.HttpServletRequest;
+import javax.servlet.http.HttpServletResponse;
 import java.io.BufferedReader;
 import java.io.File;
 import java.io.IOException;
@@ -71,6 +73,8 @@ public class SpringApiTester {
         this.packagePath = packagePath;
         ignoreAnnotations = new ArrayList<>();
         ignoreClasses = new ArrayList<>();
+        ignoreClasses.add(HttpServletRequest.class);
+        ignoreClasses.add(HttpServletResponse.class);
         methodAnalyzers = new ArrayList<>();
         methodAnalyzers.add(new UrlAnalyzer());
         methodAnalyzers.add(new HttpMethodAnalyzer());

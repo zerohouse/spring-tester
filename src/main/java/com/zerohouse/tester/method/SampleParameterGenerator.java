@@ -28,7 +28,7 @@ public class SampleParameterGenerator implements MethodAnalyzer {
     public void analyze(Method method, Map apiAnalysis) {
         Optional<Parameter> optional = Arrays.stream(method.getParameters()).filter(parameter -> parameter.isAnnotationPresent(RequestBody.class)).findAny();
         boolean json = optional.isPresent();
-        if(json)
+        if (json)
             apiAnalysis.put("json", true);
 
         if (method.isAnnotationPresent(Api.class)) {
@@ -50,7 +50,7 @@ public class SampleParameterGenerator implements MethodAnalyzer {
                 Parameter parameter = method.getParameters()[i];
                 if (ignoreAnnotations.stream().anyMatch(parameter::isAnnotationPresent))
                     continue;
-                if (ignoreClasses.stream().anyMatch(aClass -> aClass.equals(parameter.getType())))
+                if (ignoreClasses.stream().anyMatch(aClass -> parameter.getType().isAssignableFrom(aClass)))
                     continue;
                 params.put(parameterNameDiscoverer.getParameterNames(method)[i], "");
             }
