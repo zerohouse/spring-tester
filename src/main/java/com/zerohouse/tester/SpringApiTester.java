@@ -84,7 +84,7 @@ public class SpringApiTester {
     }
 
     public List<Map> getApiList() {
-        Reflections reflections = new Reflections(new SubTypesScanner(), new TypeAnnotationsScanner(), new MethodAnnotationsScanner(), ClasspathHelper.forPackage(packagePath));
+        Reflections reflections = new Reflections(new TypeAnnotationsScanner(), new MethodAnnotationsScanner(), ClasspathHelper.forPackage(packagePath));
         Set<Method> requestMappingMethods = reflections.getMethodsAnnotatedWith(RequestMapping.class);
         List<Map> apiAnalysisList = new ArrayList<>();
 
