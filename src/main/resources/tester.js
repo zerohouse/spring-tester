@@ -1,4 +1,24 @@
 var app = angular.module('app', ["ngPrettyJson", 'ngFileUpload']);
+app.directive('fieldDesc', function () {
+    return {
+        restrict: 'E',
+        scope: {data: '=', constraints: '='},
+        template: '<table class="u-full-width">' +
+        '<thead><tr><th>Name</th><th>Type</th><th>Description</th><th ng-if="constraints">Constraints</th></tr></thead>' +
+        '<tbody>' +
+        '<tr ng-repeat="datum in data">' +
+        '<td>{{datum.name}}</td><td>{{datum.type}}</td><td>{{datum.description}}' +
+        '<div ng-if="datum.enum && datum.enumValues.length>0"><span class="bold">{{datum.type}}</span>: <span ng-repeat="v in datum.enumValues">{{v}}<span ng-if="!$last">, </span></span></div>' +
+        '</td><td><span ng-if="datum.required">Required</span> <div ng-repeat="con in datum.constraints">{{con}}</div></td>' +
+        '</tr>' +
+        '</tbody>' +
+        '<tbody ng-if="datum.subClass"  ng-repeat="datum in data">' +
+        '<tr><td colspan="4" class="bold"><span style="margin-left:30px;display:block;">{{datum.type}} Structure</span></td>' +
+        '<tr><td colspan="4"><field-desc style="margin-left:30px;display:block;" data="datum.subClass" constraints="constraints"></field-desc></td></tr>' +
+        '</tbody>' +
+        '</table>'
+    }
+});
 app.filter('trust', [
     '$sce',
     function ($sce) {
@@ -7,7 +27,7 @@ app.filter('trust', [
         };
     }
 ]);
-app.controller('apiCtrl', function ($scope, $http) {
+app.controller('apiCtrl', function ($scope, $http, $timeout) {
     $scope.order = {};
     $scope.orderBy = function (order) {
         if ($scope.order.order === order) {
@@ -20,10 +40,10 @@ app.controller('apiCtrl', function ($scope, $http) {
     $scope.methods = ['GET', 'HEAD', 'POST', 'PUT', 'PATCH', 'DELETE', 'OPTIONS', 'TRACE'];
     $scope.headers = typeof headers === "undefined" ? {} : headers;
     $scope.tableHeaders = typeof tableHeaders === "undefined" ? {
-            name: "Name",
-            url: "URL",
-            methodsString: "Method"
-        } : tableHeaders;
+        name: "Name",
+        url: "URL",
+        methodsString: "Method"
+    } : tableHeaders;
     if ($scope.tableHeaders) {
         $scope.order.order = Object.keys($scope.tableHeaders)[0];
     }
@@ -58,6 +78,9 @@ app.controller('apiCtrl', function ($scope, $http) {
             $scope.method = 'GET';
         } else
             $scope.method = $scope.selectedApi.methods[0];
+        $timeout(function () {
+            window.scrollTo(0, 0);
+        });
     };
     $scope.newHeader = function () {
         $scope.headers[prompt("Key?")] = "";
@@ -118,9 +141,9 @@ app.controller('apiCtrl', function ($scope, $http) {
         }
 
         $http(options).then(function onSuccess(res) {
-            $scope.response = res;
+            $scope.response = res.data;
         }).catch(function onError(e) {
-            $scope.response = e;
+            $scope.response = e.data;
         });
     };
     $scope.isEmpty = function (map) {

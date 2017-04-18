@@ -19,8 +19,8 @@ public class SampleParameterGeneratorTest {
         defaultValues.put(Date.class, null);
         defaultValues.put(List.class, new ArrayList<>());
         defaultValues.put(Map.class, new HashMap<>());
-        SampleParameterGenerator sampleParameterGenerator = new SampleParameterGenerator(new ArrayList<>(), new ArrayList<>(), defaultValues);
-        System.out.println(sampleParameterGenerator);
+//        SampleParameterGenerator sampleParameterGenerator = new SampleParameterGenerator();
+//        System.out.println(sampleParameterGenerator);
         assertTrue(true);
     }
 

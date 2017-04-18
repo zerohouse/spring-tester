@@ -5,7 +5,6 @@ import java.lang.annotation.ElementType;
 import java.lang.annotation.Retention;
 import java.lang.annotation.RetentionPolicy;
 import java.lang.annotation.Target;
-import java.util.Map;
 
 @Target({ElementType.METHOD})
 @Retention(RetentionPolicy.RUNTIME)
@@ -15,8 +14,11 @@ public @interface Api {
 
     String description() default "";
 
-    String parameter() default "";
+    Class<?> responseClass() default void.class;
 
-    Class parameterType() default Map.class;
+    String[] errorResponses() default {};
 
+    String responseJson() default "";
+
+    boolean responseAsList() default false;
 }

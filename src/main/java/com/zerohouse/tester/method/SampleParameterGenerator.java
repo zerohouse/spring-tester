@@ -1,72 +1,59 @@
 package com.zerohouse.tester.method;
 
-import com.fasterxml.jackson.databind.ObjectMapper;
-import com.zerohouse.tester.annotation.Api;
+import com.zerohouse.tester.method.util.ObjectMaker;
+import com.zerohouse.tester.method.util.ParameterIgnoreChecker;
 import org.springframework.core.DefaultParameterNameDiscoverer;
 import org.springframework.core.ParameterNameDiscoverer;
 import org.springframework.web.bind.annotation.RequestBody;
 
-import java.io.IOException;
 import java.lang.reflect.Method;
 import java.lang.reflect.Parameter;
 import java.util.*;
 
 public class SampleParameterGenerator implements MethodAnalyzer {
 
-    List<Class> ignoreAnnotations;
-    List<Class> ignoreClasses;
-    Map<Class, Object> defaultValues;
-    ObjectMapper objectMapper = new ObjectMapper();
+    ObjectMaker objectMaker;
+    private ParameterIgnoreChecker parameterIgnoreChecker;
 
-    public SampleParameterGenerator(List<Class> ignoreAnnotations, List<Class> ignoreClasses, Map<Class, Object> defaultValues) {
-        this.ignoreAnnotations = ignoreAnnotations;
-        this.ignoreClasses = ignoreClasses;
-        this.defaultValues = defaultValues;
+    public SampleParameterGenerator(ParameterIgnoreChecker parameterIgnoreChecker, ObjectMaker objectMaker) {
+        this.parameterIgnoreChecker = parameterIgnoreChecker;
+        this.objectMaker = objectMaker;
     }
 
     @Override
     public void analyze(Method method, Map apiAnalysis) {
         Optional<Parameter> optional = Arrays.stream(method.getParameters()).filter(parameter -> parameter.isAnnotationPresent(RequestBody.class)).findAny();
         boolean json = optional.isPresent();
-        if (json)
-            apiAnalysis.put("json", true);
-
-        if (method.isAnnotationPresent(Api.class)) {
-            Api apiDescription = method.getAnnotation(Api.class);
-            if (!"".equals(apiDescription.parameter())) {
-                try {
-                    apiAnalysis.put("parameter", objectMapper.readValue(apiDescription.parameter().replace("'", "\""), apiDescription.parameterType()));
-                } catch (IOException e) {
-                    apiAnalysis.put("parameter", new HashMap<>());
-                    e.printStackTrace();
-                }
-                return;
-            }
-        }
+        apiAnalysis.put("json", json);
         if (!json) {
-            HashMap<String, String> params = new HashMap<>();
+            HashMap<String, Object> params = new HashMap<>();
             ParameterNameDiscoverer parameterNameDiscoverer = new DefaultParameterNameDiscoverer();
             for (int i = 0; i < method.getParameters().length; i++) {
                 Parameter parameter = method.getParameters()[i];
-                if (ignoreAnnotations.stream().anyMatch(parameter::isAnnotationPresent))
+                if (parameterIgnoreChecker.isIgnore(parameter))
                     continue;
-                if (ignoreClasses.stream().anyMatch(aClass -> parameter.getType().isAssignableFrom(aClass)))
+                Object paramObject = objectMaker.getParamObject(parameter);
+                if (paramObject != null) {
+                    params.put(parameterNameDiscoverer.getParameterNames(method)[i], paramObject);
                     continue;
+                }
                 params.put(parameterNameDiscoverer.getParameterNames(method)[i], "");
             }
             apiAnalysis.put("parameter", params);
             return;
         }
         Parameter find = optional.get();
-        if (find.getType() == List.class || find.getType().isArray())
+        Object paramObject = objectMaker.getParamObject(find);
+        if (paramObject != null) {
+            apiAnalysis.put("parameter", paramObject);
+            return;
+        }
+        if (List.class.isAssignableFrom(find.getType()) || find.getType().isArray())
             apiAnalysis.put("parameter", new ArrayList<>());
-        else if (find.getType() == Map.class)
+        else if (Map.class.isAssignableFrom(find.getType()))
             apiAnalysis.put("parameter", new HashMap<>());
         else
-            try {
-                apiAnalysis.put("parameter", find.getType().newInstance());
-            } catch (InstantiationException | IllegalAccessException e) {
-                e.printStackTrace();
-            }
+            apiAnalysis.put("parameter", objectMaker.makeSampleObject(find.getType()));
     }
+
 }

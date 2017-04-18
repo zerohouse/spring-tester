@@ -1,13 +1,15 @@
 package com.zerohouse.tester;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
+import com.zerohouse.tester.annotation.ExcludeApi;
 import com.zerohouse.tester.controller.SpringTesterController;
 import com.zerohouse.tester.method.*;
+import com.zerohouse.tester.method.util.ObjectMaker;
+import com.zerohouse.tester.method.util.ParameterIgnoreChecker;
 import org.apache.commons.io.FileUtils;
 import org.apache.commons.io.IOUtils;
 import org.reflections.Reflections;
 import org.reflections.scanners.MethodAnnotationsScanner;
-import org.reflections.scanners.SubTypesScanner;
 import org.reflections.scanners.TypeAnnotationsScanner;
 import org.reflections.util.ClasspathHelper;
 import org.springframework.beans.factory.config.BeanDefinition;
@@ -34,6 +36,8 @@ public class SpringApiTester {
     List<Class> ignoreClasses;
     List<MethodAnalyzer> methodAnalyzers;
     Map<String, String> httpHeaders;
+    Map<Class, Object> defaultValues;
+
 
     public Map<String, String> getTableHeaders() {
         return tableHeaders;
@@ -44,7 +48,6 @@ public class SpringApiTester {
     }
 
     Map<String, String> tableHeaders;
-    Map<Class, Object> defaultValues;
 
     public SpringApiTester() {
     }
@@ -53,8 +56,13 @@ public class SpringApiTester {
         objectMapper = new ObjectMapper();
         httpHeaders = new LinkedHashMap<>();
         tableHeaders = new LinkedHashMap<>();
-        defaultValues = new HashMap<>();
+        tableHeaders.put("value", "Name");
 
+        tableHeaders.put("url", "Url");
+        tableHeaders.put("methodsString", "Method");
+        tableHeaders.put("paramNames", "Parameters");
+
+        defaultValues = new HashMap<>();
         defaultValues.put(String.class, "");
         defaultValues.put(Integer.class, 0);
         defaultValues.put(Double.class, 0d);
@@ -65,11 +73,6 @@ public class SpringApiTester {
         defaultValues.put(List.class, new ArrayList<>());
         defaultValues.put(Map.class, new HashMap<>());
 
-        tableHeaders.put("value", "Name");
-        tableHeaders.put("url", "Url");
-        tableHeaders.put("methodsString", "Method");
-        tableHeaders.put("paramNames", "Parameters");
-
         this.packagePath = packagePath;
         ignoreAnnotations = new ArrayList<>();
         ignoreClasses = new ArrayList<>();
@@ -78,9 +81,12 @@ public class SpringApiTester {
         methodAnalyzers = new ArrayList<>();
         methodAnalyzers.add(new UrlAnalyzer());
         methodAnalyzers.add(new HttpMethodAnalyzer());
-        methodAnalyzers.add(new ApiDescriptionAnalyzer());
-        methodAnalyzers.add(new SampleParameterGenerator(ignoreAnnotations, ignoreClasses, defaultValues));
-        methodAnalyzers.add(new ParameterNamesGenerator(ignoreAnnotations, ignoreClasses));
+        ObjectMaker objectMaker = new ObjectMaker(defaultValues);
+        methodAnalyzers.add(new ApiDescriptionAnalyzer(objectMaker));
+        ParameterIgnoreChecker parameterIgnoreChecker = new ParameterIgnoreChecker(ignoreAnnotations, ignoreClasses);
+        methodAnalyzers.add(new SampleParameterGenerator(parameterIgnoreChecker, objectMaker));
+        methodAnalyzers.add(new ParameterNamesGenerator(parameterIgnoreChecker));
+        methodAnalyzers.add(new ParameterDescriptionGenerator(ignoreAnnotations, ignoreClasses));
     }
 
     public List<Map> getApiList() {
@@ -88,12 +94,13 @@ public class SpringApiTester {
         Set<Method> requestMappingMethods = reflections.getMethodsAnnotatedWith(RequestMapping.class);
         List<Map> apiAnalysisList = new ArrayList<>();
 
-        requestMappingMethods.forEach(method -> {
-            Map apiAnalysis = new HashMap<>();
-            methodAnalyzers.forEach(methodAnalyzer -> methodAnalyzer.analyze(method, apiAnalysis));
-            apiAnalysisList.add(apiAnalysis);
-        });
-
+        requestMappingMethods.stream()
+                .filter(method -> !method.getDeclaringClass().isAnnotationPresent(ExcludeApi.class) && method.getAnnotation(ExcludeApi.class) == null)
+                .forEach(method -> {
+                    Map apiAnalysis = new HashMap<>();
+                    methodAnalyzers.forEach(methodAnalyzer -> methodAnalyzer.analyze(method, apiAnalysis));
+                    apiAnalysisList.add(apiAnalysis);
+                });
 
         return apiAnalysisList;
     }
@@ -126,8 +133,6 @@ public class SpringApiTester {
         BeanDefinition beanDefinition = new RootBeanDefinition(SpringTesterController.class, constructorArgumentValues, null);
         beanDefinitionRegistry.registerBeanDefinition("SpringTesterController", beanDefinition);
     }
-
-
 
 
     private String getStringFromFile(String path) throws IOException {

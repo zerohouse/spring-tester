@@ -1,5 +1,6 @@
 package com.zerohouse.tester.method;
 
+import com.zerohouse.tester.method.util.ParameterIgnoreChecker;
 import org.springframework.core.DefaultParameterNameDiscoverer;
 import org.springframework.core.ParameterNameDiscoverer;
 import org.springframework.web.bind.annotation.RequestBody;
@@ -14,24 +15,20 @@ import java.util.stream.Collectors;
 
 public class ParameterNamesGenerator implements MethodAnalyzer {
 
-    List<Class> ignoreAnnotations;
-    List<Class> ignoreClasses;
+    ParameterIgnoreChecker parameterIgnoreChecker;
 
-    public ParameterNamesGenerator(List<Class> ignoreAnnotations, List<Class> ignoreClasses) {
-        this.ignoreAnnotations = ignoreAnnotations;
-        this.ignoreClasses = ignoreClasses;
+    public ParameterNamesGenerator(ParameterIgnoreChecker parameterIgnoreChecker) {
+        this.parameterIgnoreChecker = parameterIgnoreChecker;
     }
 
     @Override
     public void analyze(Method method, Map apiAnalysis) {
-        if (!Arrays.stream(method.getParameters()).anyMatch(parameter -> parameter.isAnnotationPresent(RequestBody.class))) {
+        if (Arrays.stream(method.getParameters()).noneMatch(parameter -> parameter.isAnnotationPresent(RequestBody.class))) {
             ParameterNameDiscoverer parameterNameDiscoverer = new DefaultParameterNameDiscoverer();
             List<String> paramNames = new ArrayList<>();
             for (int i = 0; i < method.getParameters().length; i++) {
                 Parameter parameter = method.getParameters()[i];
-                if (ignoreAnnotations.stream().anyMatch(parameter::isAnnotationPresent))
-                    continue;
-                if (ignoreClasses.stream().anyMatch(aClass -> aClass.equals(parameter.getType())))
+                if (parameterIgnoreChecker.isIgnore(parameter))
                     continue;
                 paramNames.add(method.getParameters()[i].getType().getSimpleName() + " " + parameterNameDiscoverer.getParameterNames(method)[i]);
             }
@@ -41,4 +38,5 @@ public class ParameterNamesGenerator implements MethodAnalyzer {
         Parameter find = Arrays.stream(method.getParameters()).filter(parameter -> parameter.isAnnotationPresent(RequestBody.class)).findAny().get();
         apiAnalysis.put("paramNames", find.getType().getSimpleName() + " (JSON)");
     }
+
 }
