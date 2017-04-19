@@ -839,7 +839,7 @@ app.directive('sample', function () {
     return {
         restrict: 'E',
         scope: {data: '='},
-        template: '<div style="padding-top:20px" ng-bind-html="data.description | trust"></div><pre pretty-json="data.example"></pre>'
+        template: '<div style="padding-top:20px" ng-if="data.description" ng-bind-html="data.description | trust"></div><pre pretty-json="data.example"></pre>'
     }
 });
 app.directive('edition', function () {
