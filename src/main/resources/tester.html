@@ -663,7 +663,7 @@
     <p style="text-align: right"><a href="https://github.com/zerohouse/spring-tester" style="text-decoration: none">Generated
         by Spring Tester</a></p>
     <div ng-show="selectedApi">
-        <h5>{{selectedApi.value || 'API'}}
+        <h5>{{selectedApi.name || 'API'}}
             <small style="margin-left:20px">{{selectedApi.url}}</small>
         </h5>
 
@@ -681,19 +681,21 @@
                 </div>
             </div>
         </div>
-        <div class="colored-block">
-            <h6 class="bold" style="padding-top:20px">Response</h6>
+        <div class="colored-block" ng-if="selectedApi.responses.length>0 || selectedApi.responseDesc.length>0">
+            <h6 style="padding-top:20px"><span class="bold">Response</span> <span ng-if="selectedApi.responseType">({{selectedApi.responseType}})</span>
+            </h6>
             <div>
-                <field-desc ng-if="selectedApi.responseDesc" data="selectedApi.responseDesc"></field-desc>
-                <div ng-if="selectedApi.responseSample">
+                <field-desc ng-if="selectedApi.responseDesc.length>0" data="selectedApi.responseDesc"></field-desc>
+                <div ng-if="selectedApi.responses.length>0">
                     <h6>Standard</h6>
-                    <pre pretty-json="selectedApi.responseSample"></pre>
+                    <sample ng-repeat="data in selectedApi.responses track by $index"
+                            data="data"></sample>
                 </div>
 
                 <div ng-if="selectedApi.errorResponses.length>0">
                     <h6>Errors</h6>
-                    <pre ng-repeat="error in selectedApi.errorResponses track by $index"
-                         pretty-json="error"></pre>
+                    <sample ng-repeat="data in selectedApi.errorResponses track by $index"
+                            data="data"></sample>
                 </div>
             </div>
         </div>
@@ -733,25 +735,25 @@
                 </div>
 
                 <div ng-switch="type">
-                    <pre ng-switch-when="json" pretty-json="selectedApi.parameter" edition="true"></pre>
+                    <pre ng-switch-when="json" pretty-json="selectedApi.parameterSample" edition="true"></pre>
                     <div ng-switch-when="form">
-                        <div ng-repeat="(key, parameter) in selectedApi.parameter">
-                            <label>{{key}} <span ngf-select ng-model="selectedApi.parameter[key]"
+                        <div ng-repeat="(key, parameterSample) in selectedApi.parameterSample">
+                            <label>{{key}} <span ngf-select ng-model="selectedApi.parameterSample[key]"
                                                  style="margin-left:30px; color:#777;">Select File</span></label>
                             <input type="text" ng-if="!isFile[key]" placeholder="{{key}}"
-                                   ng-model="selectedApi.parameter[key]"
+                                   ng-model="selectedApi.parameterSample[key]"
                                    class="u-full-width">
                         </div>
                         <strong style="font-size:13px;" ng-click="newParameter()">+ add New Parameter</strong>
                     </div>
                     <div ng-switch-default>
                         <div class="margin-bottom-20">
-                        <span ng-repeat="(key, parameter) in selectedApi.parameter"><strong>{{key}}</strong>=<span
-                                style="color:green">{{parameter}}</span><span ng-if="!$last">&</span></span>
+                        <span ng-repeat="(key, parameterSample) in selectedApi.parameterSample"><strong>{{key}}</strong>=<span
+                                style="color:green">{{parameterSample}}</span><span ng-if="!$last">&</span></span>
                         </div>
-                        <div ng-repeat="(key, parameter) in selectedApi.parameter" class="input-group">
+                        <div ng-repeat="(key, parameterSample) in selectedApi.parameterSample" class="input-group">
                             <label>{{key}}</label>
-                            <input type="text" placeholder="{{key}}" ng-model="selectedApi.parameter[key]"
+                            <input type="text" placeholder="{{key}}" ng-model="selectedApi.parameterSample[key]"
                                    class="u-full-width">
                         </div>
                         <strong style="font-size:13px;" ng-click="newParameter()">+ add New Parameter</strong>

@@ -1,11 +1,14 @@
 package com.zerohouse.tester;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
+import com.zerohouse.tester.analyze.ApiAnalyze;
 import com.zerohouse.tester.annotation.ExcludeApi;
 import com.zerohouse.tester.controller.SpringTesterController;
 import com.zerohouse.tester.method.*;
-import com.zerohouse.tester.method.util.ObjectMaker;
 import com.zerohouse.tester.method.util.ParameterIgnoreChecker;
+import com.zerohouse.tester.method.util.ParameterMaker;
+import com.zerohouse.tester.method.util.ResponseMaker;
+import com.zerohouse.tester.spec.ResponseSampleProcessor;
 import org.apache.commons.io.FileUtils;
 import org.apache.commons.io.IOUtils;
 import org.reflections.Reflections;
@@ -34,10 +37,10 @@ public class SpringApiTester {
 
     List<Class> ignoreAnnotations;
     List<Class> ignoreClasses;
+    List<ResponseSampleProcessor> responseSampleProcessors;
     List<MethodAnalyzer> methodAnalyzers;
     Map<String, String> httpHeaders;
     Map<Class, Object> defaultValues;
-
 
     public Map<String, String> getTableHeaders() {
         return tableHeaders;
@@ -49,14 +52,12 @@ public class SpringApiTester {
 
     Map<String, String> tableHeaders;
 
-    public SpringApiTester() {
-    }
-
-    public SpringApiTester(String packagePath) {
+    public SpringApiTester(String packagePath, Object defaultResponse) {
         objectMapper = new ObjectMapper();
         httpHeaders = new LinkedHashMap<>();
         tableHeaders = new LinkedHashMap<>();
-        tableHeaders.put("value", "Name");
+        responseSampleProcessors = new ArrayList<>();
+        tableHeaders.put("name", "Name");
 
         tableHeaders.put("url", "Url");
         tableHeaders.put("methodsString", "Method");
@@ -81,27 +82,27 @@ public class SpringApiTester {
         methodAnalyzers = new ArrayList<>();
         methodAnalyzers.add(new UrlAnalyzer());
         methodAnalyzers.add(new HttpMethodAnalyzer());
-        ObjectMaker objectMaker = new ObjectMaker(defaultValues);
-        methodAnalyzers.add(new ApiDescriptionAnalyzer(objectMaker));
+        ResponseMaker responseMaker = new ResponseMaker(defaultValues, responseSampleProcessors, defaultResponse);
+        methodAnalyzers.add(new ApiDescriptionAnalyzer(responseMaker));
         ParameterIgnoreChecker parameterIgnoreChecker = new ParameterIgnoreChecker(ignoreAnnotations, ignoreClasses);
-        methodAnalyzers.add(new SampleParameterGenerator(parameterIgnoreChecker, objectMaker));
+        ParameterMaker parameterMaker = new ParameterMaker(defaultValues);
+        methodAnalyzers.add(new SampleParameterGenerator(parameterIgnoreChecker, parameterMaker));
         methodAnalyzers.add(new ParameterNamesGenerator(parameterIgnoreChecker));
         methodAnalyzers.add(new ParameterDescriptionGenerator(ignoreAnnotations, ignoreClasses));
     }
 
-    public List<Map> getApiList() {
+    public List<ApiAnalyze> getApiList() {
         Reflections reflections = new Reflections(new TypeAnnotationsScanner(), new MethodAnnotationsScanner(), ClasspathHelper.forPackage(packagePath));
         Set<Method> requestMappingMethods = reflections.getMethodsAnnotatedWith(RequestMapping.class);
-        List<Map> apiAnalysisList = new ArrayList<>();
+        List<ApiAnalyze> apiAnalysisList = new ArrayList<>();
 
         requestMappingMethods.stream()
                 .filter(method -> !method.getDeclaringClass().isAnnotationPresent(ExcludeApi.class) && method.getAnnotation(ExcludeApi.class) == null)
                 .forEach(method -> {
-                    Map apiAnalysis = new HashMap<>();
+                    ApiAnalyze apiAnalysis = new ApiAnalyze();
                     methodAnalyzers.forEach(methodAnalyzer -> methodAnalyzer.analyze(method, apiAnalysis));
                     apiAnalysisList.add(apiAnalysis);
                 });
-
         return apiAnalysisList;
     }
 
@@ -162,5 +163,9 @@ public class SpringApiTester {
 
     public void putHttpHeader(String key, String value) {
         httpHeaders.put(key, value);
+    }
+
+    public void addPostProcessor(ResponseSampleProcessor responseSampleProcessor) {
+        responseSampleProcessors.add(responseSampleProcessor);
     }
 }

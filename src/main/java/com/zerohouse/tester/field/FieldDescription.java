@@ -1,6 +1,6 @@
 package com.zerohouse.tester.field;
 
-import com.zerohouse.tester.annotation.Desc;
+import lombok.EqualsAndHashCode;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
 import lombok.Setter;
@@ -14,6 +14,7 @@ import java.util.List;
 @Getter
 @Setter
 @NoArgsConstructor
+@EqualsAndHashCode(of = "name")
 public class FieldDescription {
 
     String type;
@@ -21,10 +22,10 @@ public class FieldDescription {
     String description;
     boolean isEnum;
     Object[] enumValues;
-    List constraints;
+    List<Const> constraints;
 
-    public FieldDescription(Class<?> clazz, String type, String name, Desc desc) {
-        constraints = new ArrayList();
+    public FieldDescription(Class<?> clazz, String type, String name, String desc) {
+        constraints = new ArrayList<>();
         if (clazz.isAnnotationPresent(Size.class)) {
             Size size = clazz.getAnnotation(Size.class);
             constraints.add(new SizeConst(size.min(), size.max(), size.message()));
@@ -42,8 +43,12 @@ public class FieldDescription {
         this.type = type;
         this.name = name;
         if (desc != null)
-            description = desc.value();
+            description = desc;
 
+    }
+
+    public FieldDescription(String name) {
+        this.name = name;
     }
 
     @Getter

@@ -1,12 +1,17 @@
 package com.zerohouse.tester.annotation;
 
-import java.lang.annotation.ElementType;
 import java.lang.annotation.Retention;
 import java.lang.annotation.RetentionPolicy;
 import java.lang.annotation.Target;
 
-@Target({ElementType.PARAMETER, ElementType.FIELD})
+@Target({})
 @Retention(RetentionPolicy.RUNTIME)
-public @interface ParameterExample {
-    String value();
+public @interface Subclass {
+    Class<?> value();
+
+    String name() default "List element";
+
+    String description() default "";
+
+    String type() default "";
 }

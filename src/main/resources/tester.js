@@ -13,11 +13,27 @@ app.directive('fieldDesc', function () {
         '</tr>' +
         '</tbody>' +
         '<tbody ng-if="datum.subClass"  ng-repeat="datum in data">' +
-        '<tr><td colspan="4" class="bold"><span style="margin-left:30px;display:block;">{{datum.type}} Structure</span></td>' +
+        '<tr><td colspan="4" class="bold"><span style="margin-left:30px;display:block;">{{datum.type}}</span></td>' +
         '<tr><td colspan="4"><field-desc style="margin-left:30px;display:block;" data="datum.subClass" constraints="constraints"></field-desc></td></tr>' +
         '</tbody>' +
         '</table>'
     }
+});
+app.directive('sample', function () {
+    return {
+        restrict: 'E',
+        scope: {data: '='},
+        template: '<div style="padding-top:20px" ng-bind-html="data.description | trust"></div><pre pretty-json="data.example"></pre>'
+    }
+});
+app.directive('edition', function () {
+    return function (s, el) {
+        var els = document.querySelectorAll('.pretty-json');
+        for (var i = 0; i < els.length; i++) {
+            els[i].id = '';
+        }
+        el.id = 'prettyjson';
+    };
 });
 app.filter('trust', [
     '$sce',

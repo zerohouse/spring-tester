@@ -14,11 +14,11 @@ public @interface Api {
 
     String description() default "";
 
-    Class<?> responseClass() default void.class;
+    Example[] errorResponses() default {};
 
-    String[] errorResponses() default {};
+    Example[] responses() default {};
 
-    String responseJson() default "";
+    Subclass[] subClasses() default @Subclass(void.class);
 
-    boolean responseAsList() default false;
+    String responseDescription() default "";
 }

@@ -1,5 +1,6 @@
 package com.zerohouse.tester.method;
 
+import com.zerohouse.tester.analyze.ApiAnalyze;
 import com.zerohouse.tester.annotation.Desc;
 import com.zerohouse.tester.annotation.ExcludeParameter;
 import com.zerohouse.tester.field.ParameterDescription;
@@ -14,7 +15,6 @@ import java.lang.reflect.Parameter;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
-import java.util.Map;
 
 public class ParameterDescriptionGenerator implements MethodAnalyzer {
 
@@ -27,7 +27,7 @@ public class ParameterDescriptionGenerator implements MethodAnalyzer {
     }
 
     @Override
-    public void analyze(Method method, Map apiAnalysis) {
+    public void analyze(Method method, ApiAnalyze apiAnalysis) {
         if (Arrays.stream(method.getParameters()).noneMatch(parameter -> parameter.isAnnotationPresent(RequestBody.class))) {
             ParameterNameDiscoverer parameterNameDiscoverer = new DefaultParameterNameDiscoverer();
             List<ParameterDescription> parameterDescriptions = new ArrayList<>();
@@ -46,17 +46,17 @@ public class ParameterDescriptionGenerator implements MethodAnalyzer {
                 );
                 parameterDescriptions.add(parameterDescription);
             }
-            apiAnalysis.put("paramDesc", parameterDescriptions);
+            apiAnalysis.setParamDesc(parameterDescriptions);
             return;
         }
         Parameter find = Arrays.stream(method.getParameters()).filter(parameter -> parameter.isAnnotationPresent(RequestBody.class)).findAny().get();
         Class type = find.getType();
-        List parameterDescriptions = getDescriptions(type);
-        apiAnalysis.put("paramDesc", parameterDescriptions);
+        List<ParameterDescription> parameterDescriptions = getDescriptions(type);
+        apiAnalysis.setParamDesc(parameterDescriptions);
     }
 
-    private List getDescriptions(Class clazz) {
-        List list = new ArrayList();
+    private List<ParameterDescription> getDescriptions(Class clazz) {
+        List<ParameterDescription> list = new ArrayList<>();
         if (clazz.getSuperclass() != null) {
             list.addAll(getDescriptions(clazz.getSuperclass()));
         }

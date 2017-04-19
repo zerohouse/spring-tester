@@ -1,12 +1,18 @@
 package com.zerohouse.tester.annotation;
 
-import java.lang.annotation.ElementType;
 import java.lang.annotation.Retention;
 import java.lang.annotation.RetentionPolicy;
 import java.lang.annotation.Target;
 
-@Target({ElementType.PARAMETER, ElementType.FIELD})
+@Target({})
 @Retention(RetentionPolicy.RUNTIME)
-public @interface ResponseExample {
+public @interface Example {
     String value();
+
+    Class<?> jsonType() default void.class;
+
+    Class<?> type() default void.class;
+
+    String description() default "";
+
 }

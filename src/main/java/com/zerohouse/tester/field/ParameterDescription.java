@@ -33,7 +33,7 @@ public class ParameterDescription extends FieldDescription {
     }
 
     public ParameterDescription(Class clazz, String type, String name, Desc desc, boolean required) {
-        super(clazz, type, name, desc);
+        super(clazz, type, name, desc != null ? desc.value() : "");
         this.required = required || (desc != null && desc.required());
     }
 
