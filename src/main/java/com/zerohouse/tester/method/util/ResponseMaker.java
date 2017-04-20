@@ -69,7 +69,7 @@ public class ResponseMaker extends Maker {
 
     public Object asJson(String value, Class<?> aClass) {
         try {
-            return postProcess(objectMapper.readValue(value, aClass));
+            return postProcess(objectMapper.readValue(value.replaceAll("'", "\""), aClass));
         } catch (IOException e) {
             e.printStackTrace();
             return postProcess(null);
