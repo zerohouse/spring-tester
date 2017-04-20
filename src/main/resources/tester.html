@@ -681,11 +681,11 @@
                 </div>
             </div>
         </div>
-        <div class="colored-block" ng-if="selectedApi.responses.length>0 || selectedApi.responseDesc.length>0">
+        <div class="colored-block" ng-if="selectedApi.responses.length>0 || selectedApi.responseDescription.length>0">
             <h6 style="padding-top:20px"><span class="bold">Response</span> <span ng-if="selectedApi.responseType">({{selectedApi.responseType}})</span>
             </h6>
             <div>
-                <field-desc ng-if="selectedApi.responseDesc.length>0" data="selectedApi.responseDesc"></field-desc>
+                <field-desc ng-if="selectedApi.responseDescription.length>0" data="selectedApi.responseDescription"></field-desc>
                 <div ng-if="selectedApi.responses.length>0">
                     <h6>Standard</h6>
                     <sample ng-repeat="data in selectedApi.responses track by $index"
