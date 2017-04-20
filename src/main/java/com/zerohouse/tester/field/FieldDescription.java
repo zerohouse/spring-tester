@@ -4,11 +4,13 @@ import lombok.EqualsAndHashCode;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
 import lombok.Setter;
+import org.hibernate.validator.constraints.*;
 
-import javax.validation.constraints.NotNull;
-import javax.validation.constraints.Pattern;
-import javax.validation.constraints.Size;
+import javax.validation.constraints.*;
+import java.lang.annotation.Annotation;
+import java.lang.reflect.InvocationTargetException;
 import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.List;
 
 @Getter
@@ -26,17 +28,12 @@ public class FieldDescription {
 
     public FieldDescription(Class<?> clazz, String type, String name, String desc) {
         constraints = new ArrayList<>();
-        if (clazz.isAnnotationPresent(Size.class)) {
-            Size size = clazz.getAnnotation(Size.class);
-            constraints.add(new SizeConst(size.min(), size.max(), size.message()));
-        }
-        if (clazz.isAnnotationPresent(Pattern.class)) {
-            Pattern pattern = clazz.getAnnotation(Pattern.class);
-            constraints.add(new PatternConst(pattern.regexp(), pattern.message()));
-        }
-        if (clazz.isAnnotationPresent(NotNull.class)) {
-            constraints.add(new Const(clazz.getAnnotation(NotNull.class).message()));
-        }
+        addConstraints(clazz, new ConstraintGetter<Class<?>>() {
+            @Override
+            public <T extends Annotation> T getConst(Class<?> object, Class<T> annotationClass) {
+                return object.getAnnotation(annotationClass);
+            }
+        });
         isEnum = clazz.isEnum();
         if (isEnum)
             enumValues = clazz.getEnumConstants();
@@ -47,22 +44,41 @@ public class FieldDescription {
 
     }
 
+    protected <T> void addConstraints(T clazz, ConstraintGetter<T> getter) {
+        Size size = getter.getConst(clazz, Size.class);
+        if (size != null)
+            constraints.add(new SizeConst(size.min(), size.max(), size.message()));
+        Pattern pattern = getter.getConst(clazz, Pattern.class);
+        if (pattern != null)
+            constraints.add(new PatternConst(pattern.regexp(), pattern.message()));
+        Arrays.stream(new Class[]{
+                Email.class, CreditCardNumber.class, Length.class, Range.class, SafeHtml.class, URL.class,
+                AssertFalse.class, AssertTrue.class, DecimalMax.class, DecimalMin.class, Digits.class, Future.class, Max.class, Min.class, NotNull.class, Null.class, Past.class}).forEach(aClass -> {
+            Annotation annotation = getter.getConst(clazz, aClass);
+            if (annotation != null)
+                try {
+                    constraints.add(new Const(annotation.annotationType().getSimpleName(), String.valueOf(annotation.getClass().getDeclaredMethod("message").invoke(annotation))));
+                } catch (NoSuchMethodException | IllegalAccessException | InvocationTargetException e) {
+                    e.printStackTrace();
+                }
+        });
+    }
+
     public FieldDescription(String name) {
         this.name = name;
+    }
+
+    public interface ConstraintGetter<E> {
+        <T extends Annotation> T getConst(E object, Class<T> annotationClass);
     }
 
     @Getter
     @Setter
     @NoArgsConstructor
     public class SizeConst extends Const {
-        int min;
-        int max;
-
         public SizeConst(int min, int max, String message) {
-            super(message);
-            type = "SIZE";
-            this.min = min;
-            this.max = max;
+            super("Size", message);
+            value = String.format("min:%d, max:%d", min, max);
         }
     }
 
@@ -70,12 +86,9 @@ public class FieldDescription {
     @Setter
     @NoArgsConstructor
     public class PatternConst extends Const {
-        String pattern;
-
         public PatternConst(String pattern, String message) {
-            super(message);
-            type = "PATTERN";
-            this.pattern = pattern;
+            super("Pattern", message);
+            this.value = pattern;
         }
     }
 
@@ -85,9 +98,10 @@ public class FieldDescription {
     public class Const {
         String message;
         String type;
+        String value;
 
-        public Const(String message) {
-            type = "NOT NULL";
+        public Const(String type, String message) {
+            this.type = type;
             this.message = message;
         }
     }

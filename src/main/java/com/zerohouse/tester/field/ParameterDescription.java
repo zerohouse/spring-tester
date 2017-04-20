@@ -4,10 +4,9 @@ import com.zerohouse.tester.annotation.Desc;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
 import lombok.Setter;
+import org.hibernate.validator.constraints.Email;
 
-import javax.validation.constraints.NotNull;
-import javax.validation.constraints.Pattern;
-import javax.validation.constraints.Size;
+import java.lang.annotation.Annotation;
 import java.lang.reflect.Parameter;
 
 @Getter
@@ -19,17 +18,13 @@ public class ParameterDescription extends FieldDescription {
 
     public ParameterDescription(Parameter clazz, String type, String name, Desc desc, boolean required) {
         this(clazz.getType(), type, name, desc, required);
-        if (clazz.isAnnotationPresent(Size.class)) {
-            Size size = clazz.getAnnotation(Size.class);
-            constraints.add(new SizeConst(size.min(), size.max(), size.message()));
-        }
-        if (clazz.isAnnotationPresent(Pattern.class)) {
-            Pattern pattern = clazz.getAnnotation(Pattern.class);
-            constraints.add(new PatternConst(pattern.regexp(), pattern.message()));
-        }
-        if (clazz.isAnnotationPresent(NotNull.class)) {
-            constraints.add(new Const(clazz.getAnnotation(NotNull.class).message()));
-        }
+        Email email = clazz.getAnnotation(Email.class);
+        addConstraints(clazz, new ConstraintGetter<Parameter>() {
+            @Override
+            public <T extends Annotation> T getConst(Parameter object, Class<T> annotationClass) {
+                return object.getAnnotation(annotationClass);
+            }
+        });
     }
 
     public ParameterDescription(Class clazz, String type, String name, Desc desc, boolean required) {

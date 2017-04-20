@@ -9,7 +9,7 @@ app.directive('fieldDesc', function () {
         '<tr ng-repeat="datum in data">' +
         '<td>{{datum.name}}</td><td>{{datum.type}}</td><td>{{datum.description}}' +
         '<div ng-if="datum.enum && datum.enumValues.length>0"><span class="bold">{{datum.type}}</span>: <span ng-repeat="v in datum.enumValues">{{v}}<span ng-if="!$last">, </span></span></div>' +
-        '</td><td><span ng-if="datum.required">Required</span> <div ng-repeat="con in datum.constraints">{{con}}</div></td>' +
+        '</td><td><span class="bold" ng-if="datum.required">Required</span> <div ng-repeat="con in datum.constraints"><span class="bold">{{con.type}}</span><span style="margin-left:10px" ng-if="con.value">{{con.value}}</span><span style="margin-left:10px" ng-if="con.message">{{con.message}}</span> </div></td>' +
         '</tr>' +
         '</tbody>' +
         '<tbody ng-if="datum.subClass"  ng-repeat="datum in data">' +
@@ -17,6 +17,11 @@ app.directive('fieldDesc', function () {
         '<tr><td colspan="4"><field-desc style="margin-left:30px;display:block;" data="datum.subClass" constraints="constraints"></field-desc></td></tr>' +
         '</tbody>' +
         '</table>'
+    }
+});
+app.filter('capitalize', function () {
+    return function (input) {
+        return (!!input) ? input.charAt(0).toUpperCase() + input.substr(1).toLowerCase() : '';
     }
 });
 app.directive('sample', function () {
