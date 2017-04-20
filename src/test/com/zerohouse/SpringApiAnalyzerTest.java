@@ -1,5 +1,6 @@
 package com.zerohouse;
 
+import com.zerohouse.tester.SpringApiTester;
 import org.junit.Test;
 
 public class SpringApiAnalyzerTest {
