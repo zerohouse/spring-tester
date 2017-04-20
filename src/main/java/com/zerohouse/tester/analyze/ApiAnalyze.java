@@ -21,7 +21,6 @@ public class ApiAnalyze {
     private List<FieldDescription> responseDescription;
 
     private String responseType;
-    private ResponseDesc responseSample;
     private List<ResponseDesc> errorResponses;
     private List<ResponseDesc> responses;
     private String url;

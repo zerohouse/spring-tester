@@ -75,4 +75,9 @@ public class ResponseMaker extends Maker {
             return postProcess(null);
         }
     }
+
+    public Object getSampleListResponse(Class<?> value) {
+        Map map = makeSampleResponse(value);
+        return postProcess(new Object[]{map});
+    }
 }

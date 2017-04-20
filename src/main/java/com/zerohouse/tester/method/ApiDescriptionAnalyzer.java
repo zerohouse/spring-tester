@@ -64,7 +64,7 @@ public class ApiDescriptionAnalyzer implements MethodAnalyzer {
                 return new ResponseDesc(e, o);
             }).collect(Collectors.toList()));
         else if (isList)
-            apiAnalysis.addResponses(new ResponseDesc(apiDescription.responseDescription(), new Object[]{responseMaker.getSampleResponse(subclass.value())}));
+            apiAnalysis.addResponses(new ResponseDesc(apiDescription.responseDescription(), responseMaker.getSampleListResponse(subclass.value())));
         else
             apiAnalysis.addResponses(new ResponseDesc(apiDescription.responseDescription(), responseMaker.getSampleResponse(returnType)));
         apiAnalysis.setErrorResponses(Arrays.stream(apiDescription.errorResponses()).map(e -> new ResponseDesc(e, responseMaker.getSampleJson(e.value()))).collect(Collectors.toList()));
