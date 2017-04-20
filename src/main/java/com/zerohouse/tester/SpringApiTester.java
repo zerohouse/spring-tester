@@ -9,6 +9,7 @@ import com.zerohouse.tester.method.util.ParameterIgnoreChecker;
 import com.zerohouse.tester.method.util.ParameterMaker;
 import com.zerohouse.tester.method.util.ResponseMaker;
 import com.zerohouse.tester.spec.ResponseSampleProcessor;
+import lombok.Setter;
 import org.apache.commons.io.FileUtils;
 import org.apache.commons.io.IOUtils;
 import org.reflections.Reflections;
@@ -29,6 +30,7 @@ import java.io.IOException;
 import java.io.InputStreamReader;
 import java.lang.reflect.Method;
 import java.util.*;
+import java.util.stream.Collectors;
 
 public class SpringApiTester {
     private ObjectMapper objectMapper;
@@ -42,20 +44,22 @@ public class SpringApiTester {
     Map<String, String> httpHeaders;
     Map<Class, Object> defaultValues;
 
-    public Map<String, String> getTableHeaders() {
-        return tableHeaders;
-    }
 
-    public void setTableHeaders(Map<String, String> tableHeaders) {
-        this.tableHeaders = tableHeaders;
-    }
-
+    @Setter
     Map<String, String> tableHeaders;
+
+    @Setter
+    Map<String, String> additionalExplain;
+
+    public void newColumn(String columnPath, String name) {
+        tableHeaders.put(columnPath, name);
+    }
 
     public SpringApiTester(String packagePath, Object defaultResponse) {
         objectMapper = new ObjectMapper();
         httpHeaders = new LinkedHashMap<>();
         tableHeaders = new LinkedHashMap<>();
+        additionalExplain = new LinkedHashMap<>();
         responseSampleProcessors = new ArrayList<>();
         tableHeaders.put("name", "Name");
 
@@ -91,7 +95,7 @@ public class SpringApiTester {
         methodAnalyzers.add(new ParameterDescriptionGenerator(ignoreAnnotations, ignoreClasses));
     }
 
-    public List<ApiAnalyze> getApiList() {
+    public List<Map> getApiList() {
         Reflections reflections = new Reflections(new TypeAnnotationsScanner(), new MethodAnnotationsScanner(), ClasspathHelper.forPackage(packagePath));
         Set<Method> requestMappingMethods = reflections.getMethodsAnnotatedWith(RequestMapping.class);
         List<ApiAnalyze> apiAnalysisList = new ArrayList<>();
@@ -103,7 +107,7 @@ public class SpringApiTester {
                     methodAnalyzers.forEach(methodAnalyzer -> methodAnalyzer.analyze(method, apiAnalysis));
                     apiAnalysisList.add(apiAnalysis);
                 });
-        return apiAnalysisList;
+        return apiAnalysisList.stream().map(ApiAnalyze::toMap).collect(Collectors.toList());
     }
 
     public String getTestPageHtml() throws IOException {
@@ -113,6 +117,7 @@ public class SpringApiTester {
         String injects = "var apis =" + objectMapper.writeValueAsString(getApiList()) + ";";
         injects += "var headers =" + objectMapper.writeValueAsString(httpHeaders) + ";";
         injects += "var tableHeaders =" + objectMapper.writeValueAsString(tableHeaders) + ";";
+        injects += "var additionalExplain =" + objectMapper.writeValueAsString(additionalExplain) + ";";
         if (this.title != null)
             injects += "var title = '" + this.title + "';";
         html = html.replace("<script src=\"vendor.js\" type=\"text/javascript\"></script>", "<script>" + vendor + "</script>");

@@ -2,6 +2,7 @@ package com.zerohouse.tester.analyze;
 
 import com.zerohouse.tester.field.FieldDescription;
 import com.zerohouse.tester.field.ParameterDescription;
+import lombok.AccessLevel;
 import lombok.Getter;
 import lombok.Setter;
 import org.springframework.web.bind.annotation.RequestMethod;
@@ -29,7 +30,12 @@ public class ApiAnalyze {
     private RequestMethod[] methods;
     private String paramNames;
     private Object parameterSample;
+
+    @Getter(AccessLevel.NONE)
     private Map options;
+
+    private List<Explain> explains;
+
 
     public ApiAnalyze() {
         options = new HashMap();
@@ -44,8 +50,31 @@ public class ApiAnalyze {
     }
 
     public void addResponses(ResponseDesc responseSample) {
-        if(responses == null)
+        if (responses == null)
             responses = new ArrayList<>();
         responses.add(responseSample);
+    }
+
+    public Map toMap() {
+        options.put("name", name);
+        options.put("description", description);
+        options.put("responseDescription", responseDescription);
+        options.put("responseType", responseType);
+        options.put("errorResponses", errorResponses);
+        options.put("responses", responses);
+        options.put("url", url);
+        options.put("json", json);
+        options.put("paramDesc", paramDesc);
+        options.put("methods", methods);
+        options.put("paramNames", paramNames);
+        options.put("parameterSample", parameterSample);
+        options.put("explains", explains);
+        return options;
+    }
+
+    public void addExplain(Explain explain) {
+        if (explains == null)
+            explains = new ArrayList<>();
+        explains.add(explain);
     }
 }

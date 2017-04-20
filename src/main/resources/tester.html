@@ -671,21 +671,28 @@
             <p ng-bind-html="selectedApi.description | trust"></p>
         </div>
 
+        <div class="colored-block" ng-repeat="explain in selectedApi.explains">
+            <h6 class="bold">{{explain.title}}</h6>
+            <div ng-bind-html="explain.body | trust"></div>
+        </div>
+
         <div class="colored-block">
-            <h6 class="bold" style="padding-top:20px">Parameter</h6>
+            <h6 class="bold">Parameter</h6>
             <div>
                 <field-desc ng-if="selectedApi.paramDesc && selectedApi.paramDesc.length!=0" constraints="true"
                             data="selectedApi.paramDesc"></field-desc>
-                <div style="padding-bottom:20px" ng-if="!(selectedApi.paramDesc && selectedApi.paramDesc.length!=0)">
+                <div ng-if="!(selectedApi.paramDesc && selectedApi.paramDesc.length!=0)">
                     No parameters.
                 </div>
             </div>
         </div>
         <div class="colored-block" ng-if="selectedApi.responses.length>0 || selectedApi.responseDescription.length>0">
-            <h6 style="padding-top:20px"><span class="bold">Response</span> <span ng-if="selectedApi.responseType">({{selectedApi.responseType}})</span>
+            <h6><span class="bold">Response</span> <span
+                    ng-if="selectedApi.responseType">({{selectedApi.responseType}})</span>
             </h6>
             <div>
-                <field-desc ng-if="selectedApi.responseDescription.length>0" data="selectedApi.responseDescription"></field-desc>
+                <field-desc ng-if="selectedApi.responseDescription.length>0"
+                            data="selectedApi.responseDescription"></field-desc>
                 <div ng-if="selectedApi.responses.length>0">
                     <h6>Standard</h6>
                     <sample ng-repeat="data in selectedApi.responses track by $index"

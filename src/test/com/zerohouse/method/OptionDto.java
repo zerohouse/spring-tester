@@ -1,4 +1,4 @@
-package com.zerohouse.tester.method;
+package com.zerohouse.method;
 
 public class OptionDto {
 

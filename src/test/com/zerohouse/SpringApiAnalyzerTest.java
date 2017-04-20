@@ -1,4 +1,4 @@
-package com.zerohouse.tester;
+package com.zerohouse;
 
 import org.junit.Test;
 

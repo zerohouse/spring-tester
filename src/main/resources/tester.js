@@ -55,6 +55,7 @@ app.controller('apiCtrl', function ($scope, $http, $timeout) {
     $scope.type = 'urlencoded';
     $scope.methods = ['GET', 'HEAD', 'POST', 'PUT', 'PATCH', 'DELETE', 'OPTIONS', 'TRACE'];
     $scope.headers = typeof headers === "undefined" ? {} : headers;
+    $scope.additionalExplain = additionalExplain;
     $scope.tableHeaders = typeof tableHeaders === "undefined" ? {
         name: "Name",
         url: "URL",
