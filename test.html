@@ -896,8 +896,8 @@ app.controller('apiCtrl', function ($scope, $http, $timeout) {
     $scope.title = typeof title === "undefined" ? "" : title;
     $scope.apis.forEach(function (api) {
         api.methodsString = api.methods.join(", ");
-        if (!api.parameter)
-            api.parameter = {};
+        if (!api.parameterSample)
+            api.parameterSample = {};
     });
 
     $scope.$watch('method', function (method) {
@@ -931,7 +931,7 @@ app.controller('apiCtrl', function ($scope, $http, $timeout) {
         $scope.headers[prompt("Key?")] = "";
     };
     $scope.newParameter = function () {
-        $scope.selectedApi.parameter[prompt("Key?")] = "";
+        $scope.selectedApi.parameterSample[prompt("Key?")] = "";
     };
     $scope.deleteHeader = function (key) {
         delete $scope.headers[key];
@@ -961,13 +961,13 @@ app.controller('apiCtrl', function ($scope, $http, $timeout) {
         options.headers = $scope.headers;
         if (method === "GET" || method === "DELETE") {
             options.url += "?dc=" + new Date().getTime().toString();
-            options.params = api.parameter;
+            options.params = api.parameterSample;
         } else if ($scope.type === "json")
-            options.data = api.parameter;
+            options.data = api.parameterSample;
         else if ($scope.type === "form") {
             var fd = new FormData();
-            for (var key in api.parameter) {
-                fd.append(key, api.parameter[key]);
+            for (var key in api.parameterSample) {
+                fd.append(key, api.parameterSample[key]);
             }
             options.data = fd;
             options.transformRequest = angular.identity;
@@ -982,7 +982,7 @@ app.controller('apiCtrl', function ($scope, $http, $timeout) {
                 }
                 return str.join("&");
             };
-            options.data = api.parameter;
+            options.data = api.parameterSample;
         }
 
         $http(options).then(function onSuccess(res) {
