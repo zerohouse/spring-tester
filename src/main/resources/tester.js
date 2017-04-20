@@ -31,15 +31,6 @@ app.directive('sample', function () {
         template: '<div style="padding-top:20px" ng-if="data.description" ng-bind-html="data.description | trust"></div><pre pretty-json="data.example"></pre>'
     }
 });
-app.directive('edition', function () {
-    return function (s, el) {
-        var els = document.querySelectorAll('.pretty-json');
-        for (var i = 0; i < els.length; i++) {
-            els[i].id = '';
-        }
-        el.id = 'prettyjson';
-    };
-});
 app.filter('trust', [
     '$sce',
     function ($sce) {
