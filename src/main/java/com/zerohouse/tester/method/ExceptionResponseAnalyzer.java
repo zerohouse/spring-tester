@@ -18,10 +18,10 @@ public class ExceptionResponseAnalyzer implements MethodAnalyzer {
     Map<Class, Object> responseMap;
     ResponseMaker responseMaker;
 
-    public ExceptionResponseAnalyzer(ResponseMaker responseMaker, Reflections reflections) {
+    public ExceptionResponseAnalyzer(ResponseMaker responseMaker, Set<Method> set) {
         responseMap = new HashMap<>();
         this.responseMaker = responseMaker;
-        reflections.getMethodsAnnotatedWith(ExceptionHandler.class).forEach(method -> {
+        set.forEach(method -> {
             ExceptionResponse exceptionResponse = method.getAnnotation(ExceptionResponse.class);
             if (exceptionResponse == null)
                 return;
