@@ -1,9 +1,7 @@
 package com.zerohouse.tester.field;
 
-import lombok.EqualsAndHashCode;
-import lombok.Getter;
-import lombok.NoArgsConstructor;
-import lombok.Setter;
+import com.zerohouse.tester.annotation.Desc;
+import lombok.*;
 import org.hibernate.validator.constraints.*;
 
 import javax.validation.constraints.*;
@@ -26,7 +24,10 @@ public class FieldDescription {
     Object[] enumValues;
     List<Const> constraints;
 
-    public FieldDescription(Class<?> clazz, String type, String name, String desc) {
+    @Getter(AccessLevel.NONE)
+    protected Desc desc;
+
+    public FieldDescription(Desc desc, Class<?> clazz, String typeName, String fieldName, String description) {
         constraints = new ArrayList<>();
         addConstraints(clazz, new ConstraintGetter<Class<?>>() {
             @Override
@@ -37,10 +38,10 @@ public class FieldDescription {
         isEnum = clazz.isEnum();
         if (isEnum)
             enumValues = clazz.getEnumConstants();
-        this.type = type;
-        this.name = name;
-        if (desc != null)
-            description = desc;
+        this.type = (desc == null || "".equals(desc.type())) ? typeName : desc.type();
+        this.name = (desc == null || "".equals(desc.name())) ? fieldName : desc.name();
+        if (description != null)
+            this.description = description;
 
     }
 

@@ -6,14 +6,14 @@ app.directive('fieldDesc', function () {
         template: '<table class="u-full-width">' +
         '<thead><tr><th>Name</th><th>Type</th><th>Description</th><th ng-if="constraints">Constraints</th></tr></thead>' +
         '<tbody>' +
-        '<tr ng-repeat="datum in data">' +
+        '<tr ng-if="datum.name"  ng-repeat="datum in data">' +
         '<td>{{datum.name}}</td><td>{{datum.type}}</td><td>{{datum.description}}' +
         '<div ng-if="datum.enum && datum.enumValues.length>0"><span class="bold">{{datum.type}}</span>: <span ng-repeat="v in datum.enumValues">{{v}}<span ng-if="!$last">, </span></span></div>' +
         '</td><td><span class="bold" ng-if="datum.required">Required</span> <div ng-repeat="con in datum.constraints"><span class="bold">{{con.type}}</span><span style="margin-left:10px" ng-if="con.value">{{con.value}}</span><span style="margin-left:10px" ng-if="con.message">{{con.message}}</span> </div></td>' +
         '</tr>' +
         '</tbody>' +
         '<tbody ng-if="datum.subClass"  ng-repeat="datum in data">' +
-        '<tr><td colspan="4" class="bold"><span style="margin-left:30px;display:block;">{{datum.type}}</span></td>' +
+        '<tr><td colspan="4" class="bold"><span style="margin-left:30px;display:block;">{{datum.subType || datum.type}}</span></td>' +
         '<tr><td colspan="4"><field-desc style="margin-left:30px;display:block;" data="datum.subClass" constraints="constraints"></field-desc></td></tr>' +
         '</tbody>' +
         '</table>'
@@ -28,7 +28,7 @@ app.directive('sample', function () {
     return {
         restrict: 'E',
         scope: {data: '='},
-        template: '<div style="padding-top:20px" ng-if="data.description" ng-bind-html="data.description | trust"></div><pre pretty-json="data.example"></pre>'
+        template: '<div style="padding-top:20px" ng-if="data.title||data.description"><div class="bold" ng-if="data.title">{{data.title}}</div><div ng-if="data.description" ng-bind-html="data.description | trust"></div></div><pre pretty-json="data.example"></pre>'
     }
 });
 app.filter('trust', [

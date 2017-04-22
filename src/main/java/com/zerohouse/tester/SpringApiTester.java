@@ -34,7 +34,6 @@ import java.util.stream.Collectors;
 
 public class SpringApiTester {
     private ObjectMapper objectMapper;
-    private String packagePath;
     private String title;
 
     List<Class> ignoreAnnotations;
@@ -43,7 +42,7 @@ public class SpringApiTester {
     List<MethodAnalyzer> methodAnalyzers;
     Map<String, String> httpHeaders;
     Map<Class, Object> defaultValues;
-
+    Set<Method> requestMappingMethods;
 
     @Setter
     Map<String, String> tableHeaders;
@@ -70,15 +69,17 @@ public class SpringApiTester {
         defaultValues = new HashMap<>();
         defaultValues.put(String.class, "");
         defaultValues.put(Integer.class, 0);
+        defaultValues.put(int.class, 0);
         defaultValues.put(Double.class, 0d);
+        defaultValues.put(double.class, 0);
         defaultValues.put(Long.class, 0L);
+        defaultValues.put(long.class, 0);
         defaultValues.put(Float.class, 0f);
+        defaultValues.put(float.class, 0);
         defaultValues.put(Boolean.class, false);
+        defaultValues.put(boolean.class, 0);
         defaultValues.put(Date.class, new Date());
-        defaultValues.put(List.class, new ArrayList<>());
-        defaultValues.put(Map.class, new HashMap<>());
 
-        this.packagePath = packagePath;
         ignoreAnnotations = new ArrayList<>();
         ignoreClasses = new ArrayList<>();
         ignoreClasses.add(HttpServletRequest.class);
@@ -93,13 +94,13 @@ public class SpringApiTester {
         methodAnalyzers.add(new SampleParameterGenerator(parameterIgnoreChecker, parameterMaker));
         methodAnalyzers.add(new ParameterNamesGenerator(parameterIgnoreChecker));
         methodAnalyzers.add(new ParameterDescriptionGenerator(ignoreAnnotations, ignoreClasses));
+        Reflections reflections = new Reflections(new TypeAnnotationsScanner(), new MethodAnnotationsScanner(), ClasspathHelper.forPackage(packagePath));
+        requestMappingMethods = reflections.getMethodsAnnotatedWith(RequestMapping.class);
+        methodAnalyzers.add(new ExceptionResponseAnalyzer(responseMaker, reflections));
     }
 
     public List<Map> getApiList() {
-        Reflections reflections = new Reflections(new TypeAnnotationsScanner(), new MethodAnnotationsScanner(), ClasspathHelper.forPackage(packagePath));
-        Set<Method> requestMappingMethods = reflections.getMethodsAnnotatedWith(RequestMapping.class);
         List<ApiAnalyze> apiAnalysisList = new ArrayList<>();
-
         requestMappingMethods.stream()
                 .filter(method -> !method.getDeclaringClass().isAnnotationPresent(ExcludeApi.class) && method.getAnnotation(ExcludeApi.class) == null)
                 .forEach(method -> {

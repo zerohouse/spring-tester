@@ -3,8 +3,7 @@ package com.zerohouse.tester.method.util;
 import com.fasterxml.jackson.databind.ObjectMapper;
 
 import java.io.IOException;
-import java.util.List;
-import java.util.Map;
+import java.util.*;
 
 public abstract class Maker {
 
@@ -15,13 +14,22 @@ public abstract class Maker {
         this.defaultValues = defaultValues;
     }
 
-    protected Object makePrimitiveElseJson(Class<?> clazz, String paramString) {
+    public Object makePrimitiveElseJsonWithoutPostProcess(Class<?> clazz, String paramString) {
         if ("".equals(paramString)) {
             if (defaultValues.get(clazz) != null)
                 return defaultValues.get(clazz);
+            if (List.class.isAssignableFrom(clazz))
+                return new ArrayList<>();
+            if (Set.class.isAssignableFrom(clazz))
+                return new ArrayList<>();
+            if (Map.class.isAssignableFrom(clazz))
+                return new HashMap<>();
             if (clazz.isEnum() && clazz.getEnumConstants().length > 0)
                 return clazz.getEnumConstants()[0];
             return null;
+        }
+        if (clazz.isEnum()) {
+            return Enum.valueOf((Class<? extends Enum>) clazz, paramString);
         }
         if (clazz.equals(String.class)) {
             return paramString;
@@ -37,6 +45,9 @@ public abstract class Maker {
         }
         if (clazz.equals(Float.class)) {
             return Float.parseFloat(paramString);
+        }
+        if (clazz.equals(Boolean.class)) {
+            return Boolean.parseBoolean(paramString);
         }
         if (clazz.equals(Boolean.class)) {
             return Boolean.parseBoolean(paramString);

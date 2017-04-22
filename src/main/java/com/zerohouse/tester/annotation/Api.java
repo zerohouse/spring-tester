@@ -14,11 +14,9 @@ public @interface Api {
 
     String description() default "";
 
-    Example[] errorResponses() default {};
-
     Example[] responses() default {};
 
-    Subclass[] subClasses() default @Subclass(void.class);
+    ExceptionDescription[] exceptions() default {};
 
-    String responseDescription() default "";
+    Subclass[] subClasses() default @Subclass(void.class);
 }

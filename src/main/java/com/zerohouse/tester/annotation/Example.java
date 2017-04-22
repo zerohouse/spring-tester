@@ -15,4 +15,5 @@ public @interface Example {
 
     String description() default "";
 
+    String title() default "";
 }

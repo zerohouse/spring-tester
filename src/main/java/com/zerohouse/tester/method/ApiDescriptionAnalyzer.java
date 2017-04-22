@@ -3,10 +3,7 @@ package com.zerohouse.tester.method;
 
 import com.zerohouse.tester.analyze.ApiAnalyze;
 import com.zerohouse.tester.analyze.ResponseDesc;
-import com.zerohouse.tester.annotation.Api;
-import com.zerohouse.tester.annotation.Desc;
-import com.zerohouse.tester.annotation.ExcludeResponse;
-import com.zerohouse.tester.annotation.Subclass;
+import com.zerohouse.tester.annotation.*;
 import com.zerohouse.tester.field.FieldDescription;
 import com.zerohouse.tester.field.FieldSubClass;
 import com.zerohouse.tester.method.util.ResponseMaker;
@@ -41,7 +38,7 @@ public class ApiDescriptionAnalyzer implements MethodAnalyzer {
             if (void.class.equals(subClass.value()))
                 return;
             description.remove(new FieldDescription(subClass.name()));
-            description.add(new FieldSubClass(subClass.value(), "".equals(subClass.type()) ? subClass.value().getSimpleName() : subClass.type(), subClass.name(), subClass.description(), makeResponseDesc(subClass.value())));
+            description.add(new FieldSubClass(subClass.value(), "".equals(subClass.type()) ? subClass.value().getSimpleName() : subClass.type(), subClass.value().getSimpleName(), subClass.name(), subClass.description(), makeResponseDesc(subClass.value())));
         });
 
         boolean isList = isList(returnType);
@@ -64,10 +61,9 @@ public class ApiDescriptionAnalyzer implements MethodAnalyzer {
                 return new ResponseDesc(e, o);
             }).collect(Collectors.toList()));
         else if (isList)
-            apiAnalysis.addResponses(new ResponseDesc(apiDescription.responseDescription(), responseMaker.getSampleListResponse(subclass.value())));
+            apiAnalysis.addResponses(new ResponseDesc(responseMaker.getSampleListResponse(subclass.value())));
         else
-            apiAnalysis.addResponses(new ResponseDesc(apiDescription.responseDescription(), responseMaker.getSampleResponse(returnType)));
-        apiAnalysis.setErrorResponses(Arrays.stream(apiDescription.errorResponses()).map(e -> new ResponseDesc(e, responseMaker.getSampleJson(e.value()))).collect(Collectors.toList()));
+            apiAnalysis.addResponses(new ResponseDesc(responseMaker.getSampleResponse(returnType)));
     }
 
     private boolean isList(Class<?> returnType) {
@@ -79,6 +75,12 @@ public class ApiDescriptionAnalyzer implements MethodAnalyzer {
         if (response.getSuperclass() != null) {
             results.addAll(makeResponseDesc(response.getSuperclass()));
         }
+        Subclasses subclasses = response.getAnnotation(Subclasses.class);
+        if (subclasses != null)
+            Arrays.stream(subclasses.value()).forEach(aClass -> {
+                FieldSubClass fieldSubClass = new FieldSubClass(aClass.getSimpleName(), makeResponseDesc(aClass));
+                results.add(fieldSubClass);
+            });
         Arrays.stream(response.getDeclaredFields()).forEach(field -> {
             if (field.isAnnotationPresent(ExcludeResponse.class))
                 return;
@@ -86,14 +88,8 @@ public class ApiDescriptionAnalyzer implements MethodAnalyzer {
             if (desc == null)
                 return;
             String name = field.getName();
-
             Class<?> type = field.getType();
-
-            if (desc.subClass()) {
-                results.add(new FieldSubClass(type, type.getSimpleName(), name, desc.value(), makeResponseDesc(field.getType())));
-                return;
-            }
-            results.add(new FieldDescription(type, type.getSimpleName(), name, desc.value()));
+            results.add(new FieldDescription(desc, type, type.getSimpleName(), name, desc.value()));
         });
         return results;
     }

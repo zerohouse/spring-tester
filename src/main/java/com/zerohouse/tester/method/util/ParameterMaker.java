@@ -19,7 +19,7 @@ public class ParameterMaker extends Maker {
             paramString = parameter.getAnnotation(Desc.class).example();
         if (paramString == null)
             return null;
-        return makePrimitiveElseJson(parameter.getType(), paramString);
+        return makePrimitiveElseJsonWithoutPostProcess(parameter.getType(), paramString);
     }
 
 
@@ -28,7 +28,7 @@ public class ParameterMaker extends Maker {
         Arrays.stream(type.getDeclaredFields()).forEach(field -> {
             Desc desc = field.getAnnotation(Desc.class);
             if (desc != null) {
-                objectMap.put(field.getName(), makePrimitiveElseJson(field.getType(), desc.example()));
+                objectMap.put(field.getName(), makePrimitiveElseJsonWithoutPostProcess(field.getType(), desc.example()));
             }
         });
         return objectMap;

@@ -3,6 +3,7 @@ package com.zerohouse.tester.method;
 import com.zerohouse.tester.analyze.ApiAnalyze;
 import com.zerohouse.tester.annotation.Desc;
 import com.zerohouse.tester.annotation.ExcludeParameter;
+import com.zerohouse.tester.annotation.Subclasses;
 import com.zerohouse.tester.field.ParameterDescription;
 import com.zerohouse.tester.field.ParameterSubClass;
 import org.springframework.core.DefaultParameterNameDiscoverer;
@@ -38,12 +39,12 @@ public class ParameterDescriptionGenerator implements MethodAnalyzer {
                 if (ignoreClasses.stream().anyMatch(aClass -> aClass.equals(parameter.getType())))
                     continue;
                 ParameterDescription parameterDescription = new ParameterDescription(
+                        parameter.getAnnotation(Desc.class),
                         method.getParameters()[i],
                         method.getParameters()[i].getType().getSimpleName(),
-                        parameterNameDiscoverer.getParameterNames(method)[i],
-                        parameter.getAnnotation(Desc.class),
-                        parameter.isAnnotationPresent(NotNull.class)
+                        parameterNameDiscoverer.getParameterNames(method)[i]
                 );
+                parameterDescription.setRequired(parameter.isAnnotationPresent(NotNull.class) || (parameter.getAnnotation(Desc.class) != null && parameter.getAnnotation(Desc.class).required()));
                 parameterDescriptions.add(parameterDescription);
             }
             apiAnalysis.setParamDesc(parameterDescriptions);
@@ -55,24 +56,35 @@ public class ParameterDescriptionGenerator implements MethodAnalyzer {
         apiAnalysis.setParamDesc(parameterDescriptions);
     }
 
-    private List<ParameterDescription> getDescriptions(Class clazz) {
+    private List<ParameterDescription> getDescriptions(Class<?> clazz) {
         List<ParameterDescription> list = new ArrayList<>();
         if (clazz.getSuperclass() != null) {
             list.addAll(getDescriptions(clazz.getSuperclass()));
         }
+        Subclasses subclasses = clazz.getAnnotation(Subclasses.class);
+        if (subclasses != null)
+            Arrays.stream(subclasses.value()).forEach(aClass -> {
+                ParameterSubClass parameterSubClass = new ParameterSubClass(aClass.getSimpleName(), getDescriptions(aClass));
+                list.add(parameterSubClass);
+            });
         Arrays.stream(clazz.getDeclaredFields()).forEach(field -> {
-            if(field.isAnnotationPresent(ExcludeParameter.class))
+            if (field.isAnnotationPresent(ExcludeParameter.class))
                 return;
             Desc desc = field.getAnnotation(Desc.class);
             if (desc == null)
                 return;
             String name = field.getName();
             String type = field.getType().getSimpleName();
-            if (desc.subClass()) {
-                list.add(new ParameterSubClass(field.getType(), type, name, desc, field.isAnnotationPresent(NotNull.class), getDescriptions(field.getType())));
-                return;
-            }
-            list.add(new ParameterDescription(field.getType(), type, name, desc, field.isAnnotationPresent(NotNull.class)));
+//            if (desc.subClass()) {
+//                ParameterSubClass parameterSubClass = new ParameterSubClass(desc, field.getType(), type, name, getDescriptions(field.getType()));
+//                parameterSubClass.checkNotNull(field.isAnnotationPresent(NotNull.class));
+//                list.add(parameterSubClass);
+//                return;
+//            }
+
+            ParameterDescription parameterDescription = new ParameterDescription(desc, field.getType(), type, name);
+            parameterDescription.checkNotNull(field.isAnnotationPresent(NotNull.class));
+            list.add(parameterDescription);
         });
         return list;
     }

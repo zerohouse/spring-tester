@@ -21,7 +21,7 @@ public class ResponseMaker extends Maker {
         this.defaultObj = defaultObj;
     }
 
-    private Object postProcess(Object example) {
+    public Object postProcess(Object example) {
         if (example == null)
             example = defaultObj;
         for (ResponseSampleProcessor responseSampleProcessor : responseSampleProcessors) {
@@ -32,7 +32,7 @@ public class ResponseMaker extends Maker {
 
 
     public Object makePrimitiveOrJson(Class<?> clazz, String paramString) {
-        return postProcess(makePrimitiveElseJson(clazz, paramString));
+        return postProcess(makePrimitiveElseJsonWithoutPostProcess(clazz, paramString));
     }
 
     private Map makeSampleResponse(Class<?> response) {
@@ -47,10 +47,10 @@ public class ResponseMaker extends Maker {
             Desc desc = field.getAnnotation(Desc.class);
             if (desc == null)
                 return;
-            map.put(name, this.makePrimitiveElseJson(field.getType(), desc.example()));
-            if (desc.subClass()) {
-                map.put(name, makeSampleResponse(field.getType()));
-            }
+            Object o = this.makePrimitiveElseJsonWithoutPostProcess(field.getType(), desc.example());
+            if(o == null)
+                System.out.println(makeSampleResponse(field.getType()));
+            map.put(name, o != null ? o : makeSampleResponse(field.getType()));
         });
         return map;
     }
@@ -61,10 +61,6 @@ public class ResponseMaker extends Maker {
         if (map.size() == 0)
             return postProcess(null);
         return postProcess(map);
-    }
-
-    public Object getSampleJson(String value) {
-        return postProcess(getJsonObject(value));
     }
 
     public Object asJson(String value, Class<?> aClass) {

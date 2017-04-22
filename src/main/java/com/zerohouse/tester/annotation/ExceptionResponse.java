@@ -5,16 +5,10 @@ import java.lang.annotation.Retention;
 import java.lang.annotation.RetentionPolicy;
 import java.lang.annotation.Target;
 
-@Target({ElementType.PARAMETER, ElementType.FIELD})
+@Target({ElementType.METHOD})
 @Retention(RetentionPolicy.RUNTIME)
-public @interface Desc {
+public @interface ExceptionResponse {
     String value();
 
-    String example() default "";
-
-    boolean required() default false;
-
-    String type() default "";
-
-    String name() default "";
+    Class<?> type() default void.class;
 }
