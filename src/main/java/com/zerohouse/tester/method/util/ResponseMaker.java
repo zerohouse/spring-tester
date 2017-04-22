@@ -48,8 +48,6 @@ public class ResponseMaker extends Maker {
             if (desc == null)
                 return;
             Object o = this.makePrimitiveElseJsonWithoutPostProcess(field.getType(), desc.example());
-            if(o == null)
-                System.out.println(makeSampleResponse(field.getType()));
             map.put(name, o != null ? o : makeSampleResponse(field.getType()));
         });
         return map;
