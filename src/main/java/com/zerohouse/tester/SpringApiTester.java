@@ -97,7 +97,8 @@ public class SpringApiTester {
         methodAnalyzers.add(new ParameterDescriptionGenerator(ignoreAnnotations, ignoreClasses));
         Reflections reflections = new Reflections(new TypeAnnotationsScanner(), new MethodAnnotationsScanner(), ClasspathHelper.forPackage(packagePath));
         requestMappingMethods = reflections.getMethodsAnnotatedWith(RequestMapping.class);
-        methodAnalyzers.add(new ExceptionResponseAnalyzer(responseMaker, reflections.getMethodsAnnotatedWith(ExceptionHandler.class)));
+        Reflections reflections2 = new Reflections(new TypeAnnotationsScanner(), new MethodAnnotationsScanner(), ClasspathHelper.forPackage(packagePath));
+        methodAnalyzers.add(new ExceptionResponseAnalyzer(responseMaker, reflections2.getMethodsAnnotatedWith(ExceptionHandler.class)));
     }
 
     public List<Map> getApiList() {
