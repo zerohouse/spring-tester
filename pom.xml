@@ -4,7 +4,7 @@
     <modelVersion>4.0.0</modelVersion>
     <groupId>com.zerohouse</groupId>
     <artifactId>SpringApiTester</artifactId>
-    <version>0.7.5</version>
+    <version>0.7.6</version>
     <packaging>jar</packaging>
     <parent>
         <groupId>org.springframework.boot</groupId>

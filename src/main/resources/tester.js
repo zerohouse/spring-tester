@@ -1,3 +1,14 @@
+Object.prototype.isEmpty = function () {
+    if (this === null) return true;
+    if (this.length > 0)    return false;
+    if (this.length === 0)  return true;
+    if (typeof this !== "object") return true;
+    for (var key in this) {
+        if (Object.prototype.hasOwnProperty.call(this, key)) return false;
+    }
+    return true;
+};
+
 var app = angular.module('app', ["ngPrettyJson", 'ngFileUpload']);
 app.directive('fieldDesc', function () {
     return {
@@ -8,7 +19,17 @@ app.directive('fieldDesc', function () {
         '<tbody>' +
         '<tr ng-if="datum.name"  ng-repeat="datum in data">' +
         '<td>{{datum.name}}</td><td>{{datum.type}}</td><td>{{datum.description}}' +
-        '<div ng-if="datum.enum && datum.enumValues.length>0"><span class="bold">{{datum.type}}</span>: <span ng-repeat="v in datum.enumValues">{{v}}<span ng-if="!$last">, </span></span></div>' +
+        '<div ng-if="datum.enum && !datum.enumValues.isEmpty()">' +
+                '<span class="bold">{{datum.type}}</span>: ' +
+                '<span ng-repeat="(key,v) in datum.enumValues">' +
+                     '<span ng-click="datum.enumDescShow=!datum.enumDescShow">{{key}}' +
+                              '<span ng-if="!v.isEmpty()">' +
+                                  '<span ng-show="!datum.enumDescShow">+</span><span ng-show="datum.enumDescShow">-</span></span>' +
+                                  '<span ng-show="datum.enumDescShow">{{v}}</span>' +
+                              '</span>' +
+                          '<span ng-if="!$last">, </span>' +
+                '</span>' +
+        '</div>' +
         '</td><td><span class="bold" ng-if="datum.required">Required</span> <div ng-repeat="con in datum.constraints"><span class="bold">{{con.type}}</span><span style="margin-left:10px" ng-if="con.value">{{con.value}}</span><span style="margin-left:10px" ng-if="con.message">{{con.message}}</span> </div></td>' +
         '</tr>' +
         '</tbody>' +

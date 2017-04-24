@@ -6,10 +6,14 @@ import org.hibernate.validator.constraints.*;
 
 import javax.validation.constraints.*;
 import java.lang.annotation.Annotation;
+import java.lang.reflect.Field;
 import java.lang.reflect.InvocationTargetException;
+import java.lang.reflect.Modifier;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
+import java.util.Map;
+import java.util.stream.Collectors;
 
 @Getter
 @Setter
@@ -21,7 +25,7 @@ public class FieldDescription {
     String name;
     String description;
     boolean isEnum;
-    Object[] enumValues;
+    Map<String, Map> enumValues;
     List<Const> constraints;
 
     @Getter(AccessLevel.NONE)
@@ -37,7 +41,7 @@ public class FieldDescription {
         });
         isEnum = clazz.isEnum();
         if (isEnum)
-            enumValues = clazz.getEnumConstants();
+            enumValues = getEnums((Class<? extends Enum>) clazz);
         this.type = (desc == null || "".equals(desc.type())) ? typeName : desc.type();
         this.name = (desc == null || "".equals(desc.name())) ? fieldName : desc.name();
         if (description != null)
@@ -45,7 +49,22 @@ public class FieldDescription {
 
     }
 
-    protected <T> void addConstraints(T clazz, ConstraintGetter<T> getter) {
+    private Map<String, Map> getEnums(Class<? extends Enum> enumClass) {
+        return Arrays.stream(enumClass.getEnumConstants())
+                .collect(Collectors.toMap(Enum::toString, o -> Arrays.stream(enumClass.getDeclaredFields())
+                        .filter(field -> !Modifier.isStatic(field.getModifiers()))
+                        .collect(Collectors.toMap(Field::getName, field -> {
+                            try {
+                                field.setAccessible(true);
+                                return field.get(o);
+                            } catch (IllegalAccessException e) {
+                                e.printStackTrace();
+                            }
+                            return null;
+                        }))));
+    }
+
+    <T> void addConstraints(T clazz, ConstraintGetter<T> getter) {
         Size size = getter.getConst(clazz, Size.class);
         if (size != null)
             constraints.add(new SizeConst(size.min(), size.max(), size.message()));
@@ -77,7 +96,7 @@ public class FieldDescription {
     @Setter
     @NoArgsConstructor
     public class SizeConst extends Const {
-        public SizeConst(int min, int max, String message) {
+        SizeConst(int min, int max, String message) {
             super("Size", message);
             value = String.format("min:%d, max:%d", min, max);
         }
@@ -87,7 +106,7 @@ public class FieldDescription {
     @Setter
     @NoArgsConstructor
     public class PatternConst extends Const {
-        public PatternConst(String pattern, String message) {
+        PatternConst(String pattern, String message) {
             super("Pattern", message);
             this.value = pattern;
         }
@@ -101,7 +120,7 @@ public class FieldDescription {
         String type;
         String value;
 
-        public Const(String type, String message) {
+        Const(String type, String message) {
             this.type = type;
             this.message = message;
         }
