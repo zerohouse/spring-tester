@@ -4,6 +4,7 @@ import com.fasterxml.jackson.databind.ObjectMapper;
 import com.zerohouse.tester.analyze.ApiAnalyze;
 import com.zerohouse.tester.annotation.ExcludeApi;
 import com.zerohouse.tester.controller.SpringTesterController;
+import com.zerohouse.tester.field.FieldDescription;
 import com.zerohouse.tester.method.*;
 import com.zerohouse.tester.method.util.ParameterIgnoreChecker;
 import com.zerohouse.tester.method.util.ParameterMaker;
@@ -56,7 +57,11 @@ public class SpringApiTester {
     }
 
     public SpringApiTester(String packagePath, Object defaultResponse) {
-        objectMapper = new ObjectMapper();
+        this(packagePath, defaultResponse, new ObjectMapper());
+    }
+
+    public SpringApiTester(String packagePath, Object defaultResponse, ObjectMapper objectMapper) {
+        this.objectMapper = FieldDescription.objectMapper = objectMapper;
         httpHeaders = new LinkedHashMap<>();
         tableHeaders = new LinkedHashMap<>();
         additionalExplain = new LinkedHashMap<>();

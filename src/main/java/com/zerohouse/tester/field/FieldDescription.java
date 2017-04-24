@@ -1,5 +1,7 @@
 package com.zerohouse.tester.field;
 
+import com.fasterxml.jackson.core.JsonProcessingException;
+import com.fasterxml.jackson.databind.ObjectMapper;
 import com.zerohouse.tester.annotation.Desc;
 import lombok.*;
 import org.hibernate.validator.constraints.*;
@@ -20,6 +22,8 @@ import java.util.stream.Collectors;
 @NoArgsConstructor
 @EqualsAndHashCode(of = "name")
 public class FieldDescription {
+
+    public static ObjectMapper objectMapper;
 
     String type;
     String name;
@@ -49,18 +53,28 @@ public class FieldDescription {
 
     }
 
+
     private Map<String, Map> getEnums(Class<? extends Enum> enumClass) {
         return Arrays.stream(enumClass.getEnumConstants())
                 .collect(Collectors.toMap(Enum::toString, o -> Arrays.stream(enumClass.getDeclaredFields())
                         .filter(field -> !Modifier.isStatic(field.getModifiers()))
+                        .filter(field -> objectMapper.canSerialize(field.getType()))
                         .collect(Collectors.toMap(Field::getName, field -> {
                             try {
                                 field.setAccessible(true);
-                                return field.get(o);
+                                Object value = field.get(o);
+                                if (value == null)
+                                    return "";
+                                try {
+                                    return objectMapper.writeValueAsString(value);
+                                } catch (JsonProcessingException e) {
+                                    e.printStackTrace();
+                                    return value.toString();
+                                }
                             } catch (IllegalAccessException e) {
                                 e.printStackTrace();
                             }
-                            return null;
+                            return "";
                         }))));
     }
 

@@ -22,10 +22,10 @@ app.directive('fieldDesc', function () {
         '<div ng-if="datum.enum && !datum.enumValues.isEmpty()">' +
                 '<span class="bold">{{datum.type}}</span>: ' +
                 '<span ng-repeat="(key,v) in datum.enumValues">' +
-                     '<span ng-click="datum.enumDescShow=!datum.enumDescShow">{{key}}' +
+                     '<span ng-click="datum.enumDescShow[key]=!datum.enumDescShow[key]">{{key}}' +
                               '<span ng-if="!v.isEmpty()">' +
-                                  '<span ng-show="!datum.enumDescShow">+</span><span ng-show="datum.enumDescShow">-</span></span>' +
-                                  '<span ng-show="datum.enumDescShow">{{v}}</span>' +
+                                  '<small ng-show="!datum.enumDescShow[key]" style="color:#8fbc8f">+</small>' +
+                                  '<span ng-show="datum.enumDescShow[key]">(<span ng-repeat="(k,v) in v">{{k}}:{{v}}<span ng-if="!$last">, </span></span>)</span>' +
                               '</span>' +
                           '<span ng-if="!$last">, </span>' +
                 '</span>' +

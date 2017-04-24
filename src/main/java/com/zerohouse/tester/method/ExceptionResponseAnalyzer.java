@@ -6,7 +6,6 @@ import com.zerohouse.tester.analyze.ResponseDesc;
 import com.zerohouse.tester.annotation.Api;
 import com.zerohouse.tester.annotation.ExceptionResponse;
 import com.zerohouse.tester.method.util.ResponseMaker;
-import org.reflections.Reflections;
 import org.springframework.web.bind.annotation.ExceptionHandler;
 
 import java.lang.reflect.Method;
