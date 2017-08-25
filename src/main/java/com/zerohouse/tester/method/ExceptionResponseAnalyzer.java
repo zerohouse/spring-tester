@@ -40,7 +40,7 @@ public class ExceptionResponseAnalyzer implements MethodAnalyzer {
         List<ResponseDesc> responseDescList = new ArrayList<>();
         Arrays.stream(method.getExceptionTypes()).forEach(aClass -> {
             Object o = responseMaker.postProcess(responseMap.get(aClass));
-            if (apiAnalysis == null)
+            if (apiAnalysis == null || apiDescription == null)
                 return;
             List<ResponseDesc> responseDescs = Arrays.stream(apiDescription.exceptions())
                     .filter(exceptionDescription -> exceptionDescription.type().equals(aClass))

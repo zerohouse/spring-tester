@@ -42,7 +42,7 @@ Mapping Path : /api/testPage
      <dependency>
          <groupId>com.github.zerohouse</groupId>
          <artifactId>spring-tester</artifactId>
-         <version>0.8.0</version>
+         <version>0.8.1</version>
      </dependency>
     
    
