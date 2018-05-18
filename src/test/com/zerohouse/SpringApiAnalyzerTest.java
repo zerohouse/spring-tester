@@ -6,8 +6,7 @@ import org.junit.Test;
 public class SpringApiAnalyzerTest {
     @Test
     public void generateTestPage() throws Exception {
-        SpringApiTester springApiTester = new SpringApiTester("com.zerohouse", null);
-        springApiTester.setTitle("편돌이");
+        SpringApiTester springApiTester = new SpringApiTester("com.zerohouse", "페이지 제목", "/api/testPage");
         springApiTester.putHttpHeader("asdf", "asdf");
         springApiTester.generateTestPageHtml("test.html");
     }
