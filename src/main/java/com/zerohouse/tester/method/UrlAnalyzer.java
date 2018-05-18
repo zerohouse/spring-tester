@@ -7,9 +7,16 @@ import java.lang.reflect.Method;
 
 public class UrlAnalyzer implements MethodAnalyzer {
 
+    private String prefix;
+
+    public UrlAnalyzer(String prefix) {
+        this.prefix = prefix;
+    }
+
     @Override
     public void analyze(Method method, ApiAnalyze apiAnalysis) {
-        String url = method.getDeclaringClass().getAnnotation(RequestMapping.class) != null ?
+        String url = prefix == null ? "" : prefix;
+        url += method.getDeclaringClass().getAnnotation(RequestMapping.class) != null ?
                 method.getDeclaringClass().getAnnotation(RequestMapping.class).value().length != 0 ?
                         method.getDeclaringClass().getAnnotation(RequestMapping.class).value()[0] : "" : "";
         if (method.isAnnotationPresent(RequestMapping.class)) {

@@ -27,10 +27,11 @@ import java.lang.reflect.Method;
 import java.util.*;
 import java.util.stream.Collectors;
 
+
 public class SpringApiTester extends SimpleUrlHandlerMapping {
     private ObjectMapper objectMapper;
     private String title;
-    private String url;
+    private String pageUrl;
 
     List<Class> ignoreAnnotations;
     List<Class> ignoreClasses;
@@ -50,15 +51,20 @@ public class SpringApiTester extends SimpleUrlHandlerMapping {
         tableHeaders.put(columnPath, name);
     }
 
-    public SpringApiTester(String packagePath, String pageTitle, String url) {
-        this(packagePath, url, pageTitle, null, new ObjectMapper());
+    public SpringApiTester(String packagePath, String pageUrl, String pageTitle) {
+        this(packagePath, pageUrl, pageTitle, null, null, new ObjectMapper());
     }
 
-    public SpringApiTester(String packagePath, String url, String pageTitle, Object defaultResponse) {
-        this(packagePath, url, pageTitle, defaultResponse, new ObjectMapper());
+
+    public SpringApiTester(String packagePath, String pageUrl, String pageTitle, String prefix) {
+        this(packagePath, pageUrl, pageTitle, prefix, null, new ObjectMapper());
     }
 
-    public SpringApiTester(String packagePath, String url, String pageTitle, Object defaultResponse, ObjectMapper objectMapper) {
+    public SpringApiTester(String packagePath, String pageUrl, String pageTitle, String prefix, Object defaultResponse) {
+        this(packagePath, pageUrl, pageTitle, prefix, defaultResponse, new ObjectMapper());
+    }
+
+    public SpringApiTester(String packagePath, String pageUrl, String pageTitle, String prefix, Object defaultResponse, ObjectMapper objectMapper) {
         this.objectMapper = FieldDescription.objectMapper = objectMapper;
         httpHeaders = new LinkedHashMap<>();
         tableHeaders = new LinkedHashMap<>();
@@ -89,7 +95,7 @@ public class SpringApiTester extends SimpleUrlHandlerMapping {
         ignoreClasses.add(HttpServletRequest.class);
         ignoreClasses.add(HttpServletResponse.class);
         methodAnalyzers = new ArrayList<>();
-        methodAnalyzers.add(new UrlAnalyzer());
+        methodAnalyzers.add(new UrlAnalyzer(prefix));
         methodAnalyzers.add(new HttpMethodAnalyzer());
         ResponseMaker responseMaker = new ResponseMaker(defaultValues, responseSampleProcessors, defaultResponse);
         methodAnalyzers.add(new ApiDescriptionAnalyzer(responseMaker));
@@ -106,21 +112,23 @@ public class SpringApiTester extends SimpleUrlHandlerMapping {
         requestMappingMethods.addAll(reflections.getMethodsAnnotatedWith(PutMapping.class));
         methodAnalyzers.add(new ExceptionResponseAnalyzer(responseMaker, reflections.getMethodsAnnotatedWith(ExceptionHandler.class)));
         this.title = pageTitle;
-        this.url = url;
+        this.pageUrl = pageUrl;
     }
 
     public void generate() {
         Map<String, Object> urlMap = new HashMap<>();
         try {
             String html = this.getTestPageHtml();
-            urlMap.put(this.url, (HttpRequestHandler) (request, response) -> {
+            urlMap.put(this.pageUrl, (HttpRequestHandler) (request, response) -> {
                 PrintWriter writer = response.getWriter();
                 writer.write(html);
             });
             this.setUrlMap(urlMap);
-            System.out.printf("%s에 Spring API Tester가 매칭되었습니다.", this.url);
+            System.out.printf("%s에 Spring API Tester가 매칭되었습니다.", this.pageUrl);
+            System.out.println();
         } catch (IOException e) {
             System.out.print("Spring API Tester - 페이지 생성중 오류가 발생했습니다.");
+            System.out.println();
         }
     }
 
