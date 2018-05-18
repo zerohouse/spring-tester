@@ -23,6 +23,6 @@ public class HttpMethodAnalyzer implements MethodAnalyzer {
             result.add(RequestMethod.DELETE);
         if (method.isAnnotationPresent(PutMapping.class) && !result.contains(RequestMethod.PUT))
             result.add(RequestMethod.PUT);
-        apiAnalysis.setMethods((RequestMethod[]) result.toArray());
+        apiAnalysis.setMethods(result.toArray(new RequestMethod[0]));
     }
 }
