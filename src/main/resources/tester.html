@@ -773,8 +773,8 @@
                 <button class="button-primary" ng-click="sendApi(selectedApi)">Send Request</button>
             </div>
 
-            <div ng-if="response" class="block">
-                <h5>Response</h5>
+            <div ng-if="responseIndex" class="block">
+                <h5>Response ({{responseIndex}})</h5>
                 <pre pretty-json="response"></pre>
             </div>
         </div>

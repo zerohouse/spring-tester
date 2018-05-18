@@ -1,7 +1,7 @@
 Object.prototype.isEmpty = function () {
     if (this === null) return true;
-    if (this.length > 0)    return false;
-    if (this.length === 0)  return true;
+    if (this.length > 0) return false;
+    if (this.length === 0) return true;
     if (typeof this !== "object") return true;
     for (var key in this) {
         if (Object.prototype.hasOwnProperty.call(this, key)) return false;
@@ -20,15 +20,15 @@ app.directive('fieldDesc', function () {
         '<tr ng-if="datum.name"  ng-repeat="datum in data">' +
         '<td>{{datum.name}}</td><td>{{datum.type}}</td><td>{{datum.description}}' +
         '<div ng-if="datum.enum && !datum.enumValues.isEmpty()">' +
-                '<span class="bold">{{datum.type}}</span>: ' +
-                '<span ng-repeat="(key,v) in datum.enumValues">' +
-                     '<span ng-click="datum.enumDescShow[key]=!datum.enumDescShow[key]">{{key}}' +
-                              '<span ng-if="!v.isEmpty()">' +
-                                  '<small ng-show="!datum.enumDescShow[key]" style="color:#8fbc8f">+</small>' +
-                                  '<span ng-show="datum.enumDescShow[key]">(<span ng-repeat="(k,v) in v">{{k}}:{{v}}<span ng-if="!$last">, </span></span>)</span>' +
-                              '</span>' +
-                          '<span ng-if="!$last">, </span>' +
-                '</span>' +
+        '<span class="bold">{{datum.type}}</span>: ' +
+        '<span ng-repeat="(key,v) in datum.enumValues">' +
+        '<span ng-click="datum.enumDescShow[key]=!datum.enumDescShow[key]">{{key}}' +
+        '<span ng-if="!v.isEmpty()">' +
+        '<small ng-show="!datum.enumDescShow[key]" style="color:#8fbc8f">+</small>' +
+        '<span ng-show="datum.enumDescShow[key]">(<span ng-repeat="(k,v) in v">{{k}}:{{v}}<span ng-if="!$last">, </span></span>)</span>' +
+        '</span>' +
+        '<span ng-if="!$last">, </span>' +
+        '</span>' +
         '</div>' +
         '</td><td><span class="bold" ng-if="datum.required">Required</span> <div ng-repeat="con in datum.constraints"><span class="bold">{{con.type}}</span><span style="margin-left:10px" ng-if="con.value">{{con.value}}</span><span style="margin-left:10px" ng-if="con.message">{{con.message}}</span> </div></td>' +
         '</tr>' +
@@ -61,6 +61,7 @@ app.filter('trust', [
     }
 ]);
 app.controller('apiCtrl', function ($scope, $http, $timeout) {
+    $scope.responseIndex = 0;
     $scope.order = {};
     $scope.orderBy = function (order) {
         if ($scope.order.order === order) {
@@ -175,7 +176,9 @@ app.controller('apiCtrl', function ($scope, $http, $timeout) {
         }
 
         $http(options).then(function onSuccess(res) {
+            console.log(res);
             $scope.response = res.data;
+            $scope.responseIndex++;
         }).catch(function onError(e) {
             $scope.response = e.data;
         });
