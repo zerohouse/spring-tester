@@ -62,6 +62,7 @@ app.filter('trust', [
 ]);
 app.controller('apiCtrl', function ($scope, $http, $timeout) {
     $scope.responseIndex = 0;
+    $scope.error = false;
     $scope.order = {};
     $scope.orderBy = function (order) {
         if ($scope.order.order === order) {
@@ -178,10 +179,13 @@ app.controller('apiCtrl', function ($scope, $http, $timeout) {
 
         $http(options).then(function onSuccess(res) {
             console.log(res);
+            $scope.error = false;
             $scope.response = res.data;
             $scope.responseIndex++;
         }).catch(function onError(e) {
+            $scope.error = true;
             $scope.response = e.data;
+            $scope.responseIndex++;
         });
     };
     $scope.isEmpty = function (map) {

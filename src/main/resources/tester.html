@@ -774,7 +774,10 @@
             </div>
 
             <div ng-if="responseIndex" class="block">
-                <h5>Response ({{responseIndex}})</h5>
+                <h5>
+                    <span ng-if="!error">Response</span>
+                    <span ng-if="error">Error</span>
+                    ({{responseIndex}})</h5>
                 <pre pretty-json="response"></pre>
             </div>
         </div>
