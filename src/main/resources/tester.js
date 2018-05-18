@@ -97,6 +97,7 @@ app.controller('apiCtrl', function ($scope, $http, $timeout) {
     });
 
     $scope.selectApi = function (api) {
+        $scope.responseIndex = 0;
         $scope.apis.forEach(function (api) {
             api.select = false;
         });
