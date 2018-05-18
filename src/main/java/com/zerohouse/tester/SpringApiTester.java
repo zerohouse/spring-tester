@@ -100,10 +100,10 @@ public class SpringApiTester extends SimpleUrlHandlerMapping {
         methodAnalyzers.add(new ParameterDescriptionGenerator(ignoreAnnotations, ignoreClasses));
         Reflections reflections = new Reflections(new TypeAnnotationsScanner(), new MethodAnnotationsScanner(), ClasspathHelper.forPackage(packagePath));
         requestMappingMethods = reflections.getMethodsAnnotatedWith(RequestMapping.class);
-        requestMappingMethods = reflections.getMethodsAnnotatedWith(GetMapping.class);
-        requestMappingMethods = reflections.getMethodsAnnotatedWith(PostMapping.class);
-        requestMappingMethods = reflections.getMethodsAnnotatedWith(DeleteMapping.class);
-        requestMappingMethods = reflections.getMethodsAnnotatedWith(PutMapping.class);
+        requestMappingMethods.addAll(reflections.getMethodsAnnotatedWith(GetMapping.class));
+        requestMappingMethods.addAll(reflections.getMethodsAnnotatedWith(PostMapping.class));
+        requestMappingMethods.addAll(reflections.getMethodsAnnotatedWith(DeleteMapping.class));
+        requestMappingMethods.addAll(reflections.getMethodsAnnotatedWith(PutMapping.class));
         methodAnalyzers.add(new ExceptionResponseAnalyzer(responseMaker, reflections.getMethodsAnnotatedWith(ExceptionHandler.class)));
         this.title = pageTitle;
         this.url = url;
@@ -118,8 +118,9 @@ public class SpringApiTester extends SimpleUrlHandlerMapping {
                 writer.write(html);
             });
             this.setUrlMap(urlMap);
+            System.out.printf("%s에 Spring API Tester가 매칭되었습니다.", this.url);
         } catch (IOException e) {
-            System.out.printf("Spring API Tester - 페이지 생성중 오류가 발생했습니다.");
+            System.out.print("Spring API Tester - 페이지 생성중 오류가 발생했습니다.");
         }
     }
 
