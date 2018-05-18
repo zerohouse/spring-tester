@@ -50,15 +50,15 @@ public class SpringApiTester extends SimpleUrlHandlerMapping {
         tableHeaders.put(columnPath, name);
     }
 
-    public SpringApiTester(String packagePath, String pageTitle, String url) throws IOException {
+    public SpringApiTester(String packagePath, String pageTitle, String url) {
         this(packagePath, url, pageTitle, null, new ObjectMapper());
     }
 
-    public SpringApiTester(String packagePath, String url, String pageTitle, Object defaultResponse) throws IOException {
+    public SpringApiTester(String packagePath, String url, String pageTitle, Object defaultResponse) {
         this(packagePath, url, pageTitle, defaultResponse, new ObjectMapper());
     }
 
-    public SpringApiTester(String packagePath, String url, String pageTitle, Object defaultResponse, ObjectMapper objectMapper) throws IOException {
+    public SpringApiTester(String packagePath, String url, String pageTitle, Object defaultResponse, ObjectMapper objectMapper) {
         this.objectMapper = FieldDescription.objectMapper = objectMapper;
         httpHeaders = new LinkedHashMap<>();
         tableHeaders = new LinkedHashMap<>();
@@ -109,14 +109,18 @@ public class SpringApiTester extends SimpleUrlHandlerMapping {
         this.url = url;
     }
 
-    private void generate() throws IOException {
+    public void generate() {
         Map<String, Object> urlMap = new HashMap<>();
-        String html = this.getTestPageHtml();
-        urlMap.put(this.url, (HttpRequestHandler) (request, response) -> {
-            PrintWriter writer = response.getWriter();
-            writer.write(html);
-        });
-        this.setUrlMap(urlMap);
+        try {
+            String html = this.getTestPageHtml();
+            urlMap.put(this.url, (HttpRequestHandler) (request, response) -> {
+                PrintWriter writer = response.getWriter();
+                writer.write(html);
+            });
+            this.setUrlMap(urlMap);
+        } catch (IOException e) {
+            System.out.printf("Spring API Tester - 페이지 생성중 오류가 발생했습니다.");
+        }
     }
 
     public List<Map> getApiList() {
