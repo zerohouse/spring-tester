@@ -27,8 +27,10 @@ public class ApiDescriptionAnalyzer implements MethodAnalyzer {
     public void analyze(Method method, ApiAnalyze apiAnalysis) {
         if (!method.isAnnotationPresent(Api.class))
             return;
+        String prefix = method.getDeclaringClass().isAnnotationPresent(Api.class) ?
+                method.getDeclaringClass().getAnnotation(Api.class).value() : "";
         Api apiDescription = method.getAnnotation(Api.class);
-        apiAnalysis.setName(apiDescription.value());
+        apiAnalysis.setName(prefix + apiDescription.value());
         apiAnalysis.setDescription(apiDescription.description());
 
         Class<?> returnType = method.getReturnType();
