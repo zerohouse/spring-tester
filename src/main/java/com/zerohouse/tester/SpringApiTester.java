@@ -3,7 +3,6 @@ package com.zerohouse.tester;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.zerohouse.tester.analyze.ApiAnalyze;
 import com.zerohouse.tester.annotation.ExcludeApi;
-import com.zerohouse.tester.controller.SpringTesterController;
 import com.zerohouse.tester.field.FieldDescription;
 import com.zerohouse.tester.method.*;
 import com.zerohouse.tester.method.util.ParameterIgnoreChecker;
@@ -17,26 +16,21 @@ import org.reflections.Reflections;
 import org.reflections.scanners.MethodAnnotationsScanner;
 import org.reflections.scanners.TypeAnnotationsScanner;
 import org.reflections.util.ClasspathHelper;
-import org.springframework.beans.factory.config.BeanDefinition;
-import org.springframework.beans.factory.config.ConstructorArgumentValues;
-import org.springframework.beans.factory.support.BeanDefinitionRegistry;
-import org.springframework.beans.factory.support.RootBeanDefinition;
-import org.springframework.web.bind.annotation.ExceptionHandler;
-import org.springframework.web.bind.annotation.RequestMapping;
+import org.springframework.web.HttpRequestHandler;
+import org.springframework.web.bind.annotation.*;
+import org.springframework.web.servlet.handler.SimpleUrlHandlerMapping;
 
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
-import java.io.BufferedReader;
-import java.io.File;
-import java.io.IOException;
-import java.io.InputStreamReader;
+import java.io.*;
 import java.lang.reflect.Method;
 import java.util.*;
 import java.util.stream.Collectors;
 
-public class SpringApiTester {
+public class SpringApiTester extends SimpleUrlHandlerMapping {
     private ObjectMapper objectMapper;
     private String title;
+    private String url;
 
     List<Class> ignoreAnnotations;
     List<Class> ignoreClasses;
@@ -56,11 +50,15 @@ public class SpringApiTester {
         tableHeaders.put(columnPath, name);
     }
 
-    public SpringApiTester(String packagePath, Object defaultResponse) {
-        this(packagePath, defaultResponse, new ObjectMapper());
+    public SpringApiTester(String packagePath, String pageTitle, String url) throws IOException {
+        this(packagePath, url, pageTitle, null, new ObjectMapper());
     }
 
-    public SpringApiTester(String packagePath, Object defaultResponse, ObjectMapper objectMapper) {
+    public SpringApiTester(String packagePath, String url, String pageTitle, Object defaultResponse) throws IOException {
+        this(packagePath, url, pageTitle, defaultResponse, new ObjectMapper());
+    }
+
+    public SpringApiTester(String packagePath, String url, String pageTitle, Object defaultResponse, ObjectMapper objectMapper) throws IOException {
         this.objectMapper = FieldDescription.objectMapper = objectMapper;
         httpHeaders = new LinkedHashMap<>();
         tableHeaders = new LinkedHashMap<>();
@@ -102,7 +100,23 @@ public class SpringApiTester {
         methodAnalyzers.add(new ParameterDescriptionGenerator(ignoreAnnotations, ignoreClasses));
         Reflections reflections = new Reflections(new TypeAnnotationsScanner(), new MethodAnnotationsScanner(), ClasspathHelper.forPackage(packagePath));
         requestMappingMethods = reflections.getMethodsAnnotatedWith(RequestMapping.class);
+        requestMappingMethods = reflections.getMethodsAnnotatedWith(GetMapping.class);
+        requestMappingMethods = reflections.getMethodsAnnotatedWith(PostMapping.class);
+        requestMappingMethods = reflections.getMethodsAnnotatedWith(DeleteMapping.class);
+        requestMappingMethods = reflections.getMethodsAnnotatedWith(PutMapping.class);
         methodAnalyzers.add(new ExceptionResponseAnalyzer(responseMaker, reflections.getMethodsAnnotatedWith(ExceptionHandler.class)));
+        this.title = pageTitle;
+        this.url = url;
+    }
+
+    private void generate() throws IOException {
+        Map<String, Object> urlMap = new HashMap<>();
+        String html = this.getTestPageHtml();
+        urlMap.put(this.url, (HttpRequestHandler) (request, response) -> {
+            PrintWriter writer = response.getWriter();
+            writer.write(html);
+        });
+        this.setUrlMap(urlMap);
     }
 
     public List<Map> getApiList() {
@@ -140,14 +154,6 @@ public class SpringApiTester {
         }
     }
 
-    public void register(BeanDefinitionRegistry beanDefinitionRegistry) {
-        ConstructorArgumentValues constructorArgumentValues = new ConstructorArgumentValues();
-        constructorArgumentValues.addGenericArgumentValue(this);
-        BeanDefinition beanDefinition = new RootBeanDefinition(SpringTesterController.class, constructorArgumentValues, null);
-        beanDefinitionRegistry.registerBeanDefinition("SpringTesterController", beanDefinition);
-    }
-
-
     private String getStringFromFile(String path) throws IOException {
         BufferedReader txtReader = new BufferedReader(new InputStreamReader(getClass().getResourceAsStream(path)));
         return IOUtils.toString(txtReader);
@@ -167,10 +173,6 @@ public class SpringApiTester {
 
     public void putDefaultValue(Class aClass, Object value) {
         defaultValues.put(aClass, value);
-    }
-
-    public void setTitle(String title) {
-        this.title = title;
     }
 
     public void putHttpHeader(String key, String value) {

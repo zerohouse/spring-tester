@@ -6,7 +6,7 @@ import org.springframework.web.bind.annotation.ResponseBody;
 
 import java.io.IOException;
 
-@RequestMapping("/api/testPage")
+@RequestMapping
 public class SpringTesterController {
 
     private String testPage;

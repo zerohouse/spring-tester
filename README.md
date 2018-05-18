@@ -13,21 +13,18 @@ Mapping Path : /api/testPage
 ### Usage
     
     @Configuration
-    public class Config implements BeanDefinitionRegistryPostProcessor {
+    public class Config {
     
-        @Override
-        public void postProcessBeanDefinitionRegistry(BeanDefinitionRegistry beanDefinitionRegistry) throws BeansException {
+        @Bean
+        public SpringApiTester springApiTester() {
             SpringApiTester apiTester = new SpringApiTester("com.funny.production");
             apiTester.addParameterIgnoreAnnotation(Connected.class);
             apiTester.setTitle("API 테스트 페이지");
             apiTester.putHttpHeader("AccessId", "");
-            apiTester.register(beanDefinitionRegistry);
+            apiTester.generate();
+            return apiTester;
         }
     
-        @Override
-        public void postProcessBeanFactory(ConfigurableListableBeanFactory configurableListableBeanFactory) throws BeansException {
-    
-        }
     }
     
     
@@ -42,7 +39,7 @@ Mapping Path : /api/testPage
      <dependency>
          <groupId>com.github.zerohouse</groupId>
          <artifactId>spring-tester</artifactId>
-         <version>0.8.1</version>
+         <version>0.8.2</version>
      </dependency>
     
    
