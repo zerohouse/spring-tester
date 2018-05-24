@@ -27,8 +27,13 @@ public class ParameterMaker extends Maker {
         Map<String, Object> objectMap = new HashMap<>();
         Arrays.stream(type.getDeclaredFields()).forEach(field -> {
             Desc desc = field.getAnnotation(Desc.class);
-            if (desc != null) {
-                objectMap.put(field.getName(), makePrimitiveElseJsonWithoutPostProcess(field.getType(), desc.example()));
+            try {
+                if (desc != null)
+                    objectMap.put(field.getName(), makePrimitiveElseJsonWithoutPostProcess(field.getType(), desc.example()));
+                else
+                    objectMap.put(field.getName(), makePrimitiveElseJsonWithoutPostProcess(field.getType(), ""));
+            } catch (Exception e) {
+                e.printStackTrace();
             }
         });
         return objectMap;
